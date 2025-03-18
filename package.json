@@ -1,0 +1,20 @@
+{
+  "name": "observite",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/facebookincubator/observite.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/facebookincubator/observite/issues"
+  },
+  "homepage": "https://github.com/facebookincubator/observite#readme",
+  "description": ""
+}
