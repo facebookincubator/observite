@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Contributing Guidelines
+    url: https://github.com/facebookincubator/observite/blob/main/CONTRIBUTING.md
+    about: Please read our contributing guidelines before submitting issues or pull requests.
+  - name: Code of Conduct
+    url: https://github.com/facebookincubator/observite/blob/main/CODE_OF_CONDUCT.md
+    about: Please follow our code of conduct in all interactions.

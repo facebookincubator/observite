@@ -1,0 +1,17 @@
+In observite, the issue is that observite-react.d.ts re-declares core classes/types instead of reusing the ones from observite, so TS sees different nominal classes (private fields differ) and rejects them.
+
+What to change in observite:
+
+Make ./react type declarations reference core types, don’t bundle/inlined-copy them.
+Ensure the emitted observite-react.d.ts is effectively:
+import type { ComponentObserver } from 'observite';
+export declare function useObserver(debugIdPrefix?: string): ComponentObserver;
+Keep runtime JS as-is (ComponentObserver imported from observite) — that part is already right.
+Update your type build pipeline so react typings don’t inline all core declarations (current bundling is causing the duplication).
+Add a compile test in observite repo that verifies this works:
+import { Observable } from 'observite';
+import { useObserver } from 'observite/react';
+
+const o = new Observable<string>({ default: 'x' });
+const { observe } = useObserver('x');
+const s: string = observe(o); // should type-check

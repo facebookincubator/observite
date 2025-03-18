@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "rootDir": "./",
+    "baseUrl": "./lib",
+    "paths": {
+      "observite": ["./observite.d.ts"],
+      "observite/react": ["./observite-react.d.ts"]
+    }
+  },
+  "include": ["lib/**/*.d.ts", "src/__tests__/type-compatibility.test.ts"]
+}

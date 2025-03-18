@@ -1,0 +1,76 @@
+{
+  "name": "observite",
+  "version": "1.0.0",
+  "description": "A lightweight global state management library with automatic memory cleanup and dynamic state containers.",
+  "main": "lib/observite.cjs",
+  "module": "lib/observite.mjs",
+  "types": "lib/observite.d.ts",
+  "files": [
+    "lib"
+  ],
+  "exports": {
+    ".": {
+      "types": "./lib/observite.d.ts",
+      "import": "./lib/observite.mjs",
+      "require": "./lib/observite.cjs",
+      "default": "./lib/observite.js"
+    },
+    "./react": {
+      "types": "./lib/observite-react.d.ts",
+      "import": "./lib/observite-react.mjs",
+      "require": "./lib/observite-react.cjs",
+      "default": "./lib/observite-react.js"
+    }
+  },
+  "scripts": {
+    "test": "jest",
+    "test:types": "tsc --noEmit -p tsconfig.test-types.json",
+    "build": "tsc && tsc-alias",
+    "bundle": "npx rollup -c",
+    "prepublishOnly": "npm run build && npm run bundle"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/facebookincubator/observite.git"
+  },
+  "keywords": [
+    "state-management",
+    "observable",
+    "react",
+    "selector",
+    "async"
+  ],
+  "author": "Meta Platforms, Inc.",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/facebookincubator/observite/issues"
+  },
+  "homepage": "https://github.com/facebookincubator/observite#readme",
+  "peerDependencies": {
+    "react": ">=19.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^28.0.3",
+    "@rollup/plugin-node-resolve": "^16.0.1",
+    "@rollup/plugin-replace": "^6.0.3",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^12.3.0",
+    "@types/jest": "^29.5.14",
+    "@types/react": "^19.0.0",
+    "dts-bundle-generator": "^9.5.1",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^30.2.0",
+    "prettier": "^3.5.3",
+    "rollup": "^4.37.0",
+    "ts-jest": "^29.2.6",
+    "tsc-alias": "^1.8.11",
+    "tsconfig-paths": "^4.2.0",
+    "tslib": "^2.8.1",
+    "typescript": "^5.8.2"
+  }
+}

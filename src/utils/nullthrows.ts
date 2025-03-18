@@ -1,0 +1,15 @@
+/**
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+import { Maybe } from '@/Maybe';
+
+export function nullthrows<T = unknown>(value: Maybe<T>, message?: string): T {
+  if (value != null) {
+    return value;
+  }
+  throw new Error(message ?? 'Got unexpected null or undefined');
+}

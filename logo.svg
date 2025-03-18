@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <title>Eye + hub nodes icon (flat)</title>
+
+  <defs>
+    <linearGradient id="bp" x1="128" y1="96" x2="384" y2="416" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFD86F"/>
+      <stop offset="1" stop-color="#4FACFE"/>
+    </linearGradient>
+
+    <ellipse id="eyeOutline" cx="256" cy="256" rx="132" ry="48"/>
+
+    <mask id="spokesMask">
+      <rect x="0" y="0" width="512" height="512" fill="white"/>
+      <use href="#eyeOutline" fill="black"/>
+      <use href="#eyeOutline" fill="none" stroke="black" stroke-width="32" stroke-linecap="round" stroke-linejoin="round"/>
+    </mask>
+  </defs>
+
+  <g stroke="url(#bp)" stroke-width="18" stroke-linecap="round" stroke-linejoin="round">
+    <g mask="url(#spokesMask)">
+      <path d="M256 108 L256 256"/>
+      <path d="M256 404 L256 256"/>
+      <path d="M108 156 L256 256"/>
+      <path d="M404 156 L256 256"/>
+      <path d="M108 356 L256 256"/>
+      <path d="M404 356 L256 256"/>
+    </g>
+
+    <g fill="url(#bp)" stroke="none">
+      <circle cx="256" cy="108" r="30"/>
+      <circle cx="108" cy="156" r="30"/>
+      <circle cx="404" cy="156" r="30"/>
+      <circle cx="256" cy="404" r="30"/>
+      <circle cx="108" cy="356" r="30"/>
+      <circle cx="404" cy="356" r="30"/>
+    </g>
+
+    <use href="#eyeOutline" fill="none"/>
+    <circle cx="256" cy="256" r="44" fill="none"/>
+    <circle cx="256" cy="256" r="18" fill="url(#bp)" stroke="none"/>
+  </g>
+</svg>
