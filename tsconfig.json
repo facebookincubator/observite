@@ -94,7 +94,7 @@
     // "strictBuiltinIteratorReturn": true,              /* Built-in iterators are instantiated with a 'TReturn' type of 'undefined' instead of 'any'. */
     // "noImplicitThis": true,                           /* Enable error reporting when 'this' is given the type 'any'. */
     // "useUnknownInCatchVariables": true,               /* Default catch clause variables as 'unknown' instead of 'any'. */
-    // "alwaysStrict": true,                             /* Ensure 'use strict' is always emitted. */
+    "alwaysStrict": true /* Ensure 'use strict' is always emitted. */,
     // "noUnusedLocals": true,                           /* Enable error reporting when local variables aren't read. */
     // "noUnusedParameters": true,                       /* Raise an error when a function parameter isn't read. */
     // "exactOptionalPropertyTypes": true,               /* Interpret optional property types as written, rather than adding 'undefined'. */
