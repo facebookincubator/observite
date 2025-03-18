@@ -5,11 +5,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-export function isPromise<T = any>(value: unknown): value is Promise<T> {
-  return (
-    value instanceof Promise ||
-    (typeof value === 'object' &&
-      value !== null &&
-      typeof (value as Promise<T>).then === 'function')
-  );
+export function isPromise<T = unknown>(value: unknown): value is Promise<T> {
+  return value instanceof Promise;
 }
