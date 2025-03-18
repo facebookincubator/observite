@@ -16,5 +16,9 @@
     "url": "https://github.com/facebookincubator/observite/issues"
   },
   "homepage": "https://github.com/facebookincubator/observite#readme",
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.2"
+  }
 }
