@@ -5,7 +5,9 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-export function nullthrows<T = unknown>(value: T, message: string): T {
+import { Maybe } from './Maybe';
+
+export function nullthrows<T = unknown>(value: Maybe<T>, message: string): T {
   if (value != null) {
     return value;
   }
