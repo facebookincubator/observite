@@ -5,8 +5,18 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-const greet = (name: string): string => {
-  return `Hello, ${name}!`;
+import { isPromise } from './utils/isPromise';
+
+const notAPromise = 'not a promise';
+const isAPromise = new Promise(() => {});
+
+const doSomethingWithAPromise = (thing: unknown) => {
+  if (isPromise(thing)) {
+    thing.then(() => {});
+  }
 };
 
-console.log(greet("World"));
+doSomethingWithAPromise(notAPromise);
+doSomethingWithAPromise(isAPromise);
+
+console.log('Finished');
