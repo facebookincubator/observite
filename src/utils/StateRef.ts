@@ -10,14 +10,14 @@ import { nullthrows } from '../utils/nullthrows';
 import { Maybe } from './Maybe';
 
 export enum Status {
-  Pending = 'pending',
-  Resolved = 'resolved',
-  Rejected = 'rejected',
+  Pending,
+  Resolved,
+  Rejected,
 }
 
 export enum ThrowMode {
-  ErrorOnPending = 'errorOnPending',
-  ThrowPromise = 'throwPromise',
+  ErrorOnPending,
+  ThrowPromise,
 }
 
 /**
@@ -57,33 +57,34 @@ type HolderForProvided<TProvide> = { provided: TProvide };
  * has changed that might alter the outcome.
  */
 abstract class StateRef<TProvide, TResolve> {
-  #holder: Maybe<HolderForProvided<TProvide>> = null;
-  #state: AsyncState<TResolve>;
-  #onStatusChanged: Maybe<StatusChangeCB> = null;
+  private holder: Maybe<HolderForProvided<TProvide>> = null;
+  private state: AsyncState<TResolve>;
+  private onStatusChanged: Maybe<StatusChangeCB> = null;
+
   constructor(
     holder: Maybe<HolderForProvided<TProvide>>,
     state: AsyncState<TResolve>,
     onStatusChanged?: Maybe<StatusChangeCB>
   ) {
-    this.#holder = holder;
-    this.#state = state;
-    this.#onStatusChanged = onStatusChanged;
+    this.holder = holder;
+    this.state = state;
+    this.onStatusChanged = onStatusChanged;
   }
 
   getStatus(): Status {
-    return this.#state.status;
+    return this.state.status;
   }
 
   protected setState(state: AsyncState<TResolve>) {
-    const prevStatus = this.#state.status;
-    this.#state = state;
+    const prevStatus = this.state.status;
+    this.state = state;
     if (prevStatus !== state.status) {
-      this.#onStatusChanged?.(state.status, prevStatus);
+      this.onStatusChanged?.(state.status, prevStatus);
     }
   }
 
   getHolderForProvided(): Maybe<HolderForProvided<TProvide>> {
-    return this.#holder;
+    return this.holder;
   }
 
   /**
@@ -92,7 +93,7 @@ abstract class StateRef<TProvide, TResolve> {
    * it simply returns the value if available.
    */
   peek(): Maybe<TResolve> {
-    return this.#state.status === Status.Resolved ? this.#state.result : null;
+    return this.state.status === Status.Resolved ? this.state.result : null;
   }
 
   /**
@@ -100,17 +101,17 @@ abstract class StateRef<TProvide, TResolve> {
    * Throws an error if the status is Status.Rejected.
    */
   getOrThrowProvided(): TProvide {
-    switch (this.#state.status) {
+    switch (this.state.status) {
       case Status.Pending:
       case Status.Resolved:
         return nullthrows(
-          this.#holder,
+          this.holder,
           'Initialized without a value and not in a rejected state.'
         ).provided;
       case Status.Rejected:
-        throw this.#state.error;
+        throw this.state.error;
       default:
-        const _: never = this.#state;
+        const _: never = this.state;
     }
     throw Error('This code path should be unreachable.');
   }
@@ -120,18 +121,18 @@ abstract class StateRef<TProvide, TResolve> {
    * Throws an error only if the status is Status.Rejected.
    */
   getOrThrowAsync(): TProvide | TResolve {
-    switch (this.#state.status) {
+    switch (this.state.status) {
       case Status.Pending:
         return nullthrows(
-          this.#holder,
+          this.holder,
           'Initialized without a value and not in a rejected state.'
         ).provided;
       case Status.Resolved:
-        return this.#state.result;
+        return this.state.result;
       case Status.Rejected:
-        throw this.#state.error;
+        throw this.state.error;
       default:
-        const _: never = this.#state;
+        const _: never = this.state;
     }
     throw Error('This code path should be unreachable.');
   }
@@ -142,21 +143,21 @@ abstract class StateRef<TProvide, TResolve> {
    * - ThrowMode.ThrowPromise: Throws the promise itself if pending
    */
   getOrThrowSync(mode: ThrowMode): TResolve {
-    switch (this.#state.status) {
+    switch (this.state.status) {
       case Status.Pending:
         if (mode === ThrowMode.ThrowPromise) {
-          throw this.#state.promise;
+          throw this.state.promise;
         } else {
           throw new Error(
             'Attempted to access a pending state from synchronous code.'
           );
         }
       case Status.Resolved:
-        return this.#state.result;
+        return this.state.result;
       case Status.Rejected:
-        throw this.#state.error;
+        throw this.state.error;
       default:
-        const _: never = this.#state;
+        const _: never = this.state;
     }
     throw Error('This code path should be unreachable.');
   }
