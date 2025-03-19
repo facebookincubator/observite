@@ -7,7 +7,6 @@
 
 import { isPromise } from '../utils/isPromise';
 import { Maybe } from '../utils/Maybe';
-import { AsyncState } from '../utils/StateRef';
 
 type Observable = { removeObserver: (observer: AbstractObserver) => void };
 type ObservableManager = {
