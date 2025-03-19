@@ -56,8 +56,7 @@ type HolderForProvided<TProvide> = { provided: TProvide };
  * request the same data, and we want to avoid re-fetching data unless something
  * has changed that might alter the outcome.
  */
-export type StateRef<TProvide, TResolve> = AbstractStateRef<TProvide, TResolve>;
-class AbstractStateRef<TProvide, TResolve> {
+abstract class StateRef<TProvide, TResolve> {
   #holder: Maybe<HolderForProvided<TProvide>> = null;
   #state: AsyncState<TResolve>;
   #onStatusChanged: Maybe<StatusChangeCB> = null;
@@ -75,8 +74,7 @@ class AbstractStateRef<TProvide, TResolve> {
     return this.#state.status;
   }
 
-  // This method should only be invoked by subclasses.
-  __setState(state: AsyncState<TResolve>) {
+  protected setState(state: AsyncState<TResolve>) {
     const prevStatus = this.#state.status;
     this.#state = state;
     if (prevStatus !== state.status) {
@@ -164,10 +162,7 @@ class AbstractStateRef<TProvide, TResolve> {
   }
 }
 
-class AsyncStateRef<TResolve> extends AbstractStateRef<
-  Promise<TResolve>,
-  TResolve
-> {
+class AsyncStateRef<TResolve> extends StateRef<Promise<TResolve>, TResolve> {
   promise: Promise<TResolve>;
   constructor(
     promise: Promise<TResolve>,
@@ -180,27 +175,33 @@ class AsyncStateRef<TResolve> extends AbstractStateRef<
     );
     this.promise = promise.then(
       (result: TResolve) => {
-        this.__setState({ status: Status.Resolved, result });
+        this.setState({ status: Status.Resolved, result });
         return result;
       },
       (thrown: Error) => {
         const error: Error = isPromise(thrown)
           ? new Error('Promise thrown inside of promise')
           : thrown;
-        this.__setState({ status: Status.Rejected, error });
+        this.setState({ status: Status.Rejected, error });
         throw error;
       }
     );
   }
 }
 
-class SyncStateRef<TResolve> extends AbstractStateRef<TResolve, TResolve> {
+class SyncStateRef<TResolve> extends StateRef<TResolve, TResolve> {
   constructor(result: TResolve, onStatusChanged?: Maybe<StatusChangeCB>) {
     super(
       { provided: result },
       { status: Status.Resolved, result },
       onStatusChanged
     );
+  }
+}
+
+class FailedStateRef<TProvide, TResolve> extends StateRef<TProvide, TResolve> {
+  constructor(error: Error) {
+    super(null, { status: Status.Rejected, error });
   }
 }
 
@@ -239,5 +240,5 @@ export function stateRefFromProvided<TProvide>(
 export function stateRefFromError<TProvide, TResolve>(
   error: Error
 ): StateRef<TProvide, TResolve> {
-  return new AbstractStateRef(null, { status: Status.Rejected, error });
+  return new FailedStateRef<TProvide, TResolve>(error);
 }

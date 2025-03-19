@@ -9,7 +9,6 @@ import {
   stateRefFromProvided,
   stateRefFromError,
   Status,
-  StateRef,
   ThrowMode,
 } from '../StateRef';
 
