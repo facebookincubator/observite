@@ -164,17 +164,22 @@ class AbstractStateRef<TProvide, TResolve> {
   }
 }
 
-class AsyncStateRef<T> extends AbstractStateRef<Promise<T>, T> {
-  promise: Promise<T>;
-  constructor(promise: Promise<T>, onStatusChanged?: Maybe<StatusChangeCB>) {
+class AsyncStateRef<TResolve> extends AbstractStateRef<
+  Promise<TResolve>,
+  TResolve
+> {
+  promise: Promise<TResolve>;
+  constructor(
+    promise: Promise<TResolve>,
+    onStatusChanged?: Maybe<StatusChangeCB>
+  ) {
     super(
       { provided: promise },
       { status: Status.Pending, promise },
       onStatusChanged
     );
-    this.promise = promise;
-    promise.then(
-      (result: T) => {
+    this.promise = promise.then(
+      (result: TResolve) => {
         this.__setState({ status: Status.Resolved, result });
         return result;
       },
@@ -189,8 +194,8 @@ class AsyncStateRef<T> extends AbstractStateRef<Promise<T>, T> {
   }
 }
 
-class SyncStateRef<T> extends AbstractStateRef<T, T> {
-  constructor(result: T, onStatusChanged?: Maybe<StatusChangeCB>) {
+class SyncStateRef<TResolve> extends AbstractStateRef<TResolve, TResolve> {
+  constructor(result: TResolve, onStatusChanged?: Maybe<StatusChangeCB>) {
     super(
       { provided: result },
       { status: Status.Resolved, result },
@@ -205,13 +210,25 @@ class SyncStateRef<T> extends AbstractStateRef<T, T> {
  * - Otherwise, a SyncStateRef is created.
  */
 export function stateRefFromProvided<TProvide>(
-  provided: TProvide | Promise<TProvide>,
+  provided: TProvide,
   onStatusChanged?: Maybe<StatusChangeCB>
-): AsyncStateRef<TProvide> | SyncStateRef<TProvide> {
+): TProvide extends Promise<infer TResolve>
+  ? AsyncStateRef<TResolve>
+  : SyncStateRef<TProvide> {
   if (isPromise(provided)) {
-    return new AsyncStateRef<TProvide>(provided, onStatusChanged);
+    return new AsyncStateRef(
+      provided,
+      onStatusChanged
+    ) as TProvide extends Promise<infer TResolve>
+      ? AsyncStateRef<TResolve>
+      : never;
   } else {
-    return new SyncStateRef<TProvide>(provided, onStatusChanged);
+    return new SyncStateRef(
+      provided,
+      onStatusChanged
+    ) as TProvide extends Promise<infer _TResolve>
+      ? never
+      : SyncStateRef<TProvide>;
   }
 }
 

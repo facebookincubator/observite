@@ -35,18 +35,20 @@ describe('StateRef Tests', () => {
   });
 
   test('should handle promise rejection in AsyncStateRef', async () => {
-    const error = new Error('Test error 1');
-    const promise = Promise.reject(error);
+    const promise = new Promise(() => {
+      throw new Error('promise rejection');
+    });
     const stateRef = stateRefFromProvided(promise);
 
     expect(stateRef.getStatus()).toBe(Status.Pending);
-
-    await promise.catch(() => {});
+    try {
+      await stateRef.promise;
+    } catch (e) {}
     expect(stateRef.getStatus()).toBe(Status.Rejected);
   });
 
   test('should create a StateRef in a rejected status with an error', () => {
-    const error = new Error('Test error 2');
+    const error = new Error('stateRefFromError');
     const stateRef = stateRefFromError(error);
 
     expect(stateRef.getStatus()).toBe(Status.Rejected);
@@ -54,63 +56,72 @@ describe('StateRef Tests', () => {
   });
 
   describe('getOrThrowProvided', () => {
-    it('returns the provided value when the status is Resolved', () => {
-      const stateRef = stateRefFromProvided('resolved');
-      expect(stateRef.getOrThrowProvided()).toBe('resolved');
-    });
-    it('throws an error when the status is Rejected', () => {
-      const stateRef = stateRefFromError(new Error('rejected'));
-      expect(() => stateRef.getOrThrowProvided()).toThrow('rejected');
-    });
-    it('throws an error when the status is Pending', () => {
-      const promise = new Promise<string>(() => {});
+    it('Async getOrThrowProvided', async () => {
+      const promise = new Promise((resolve) => resolve(1));
       const stateRef = stateRefFromProvided(promise);
-      expect(() => stateRef.getOrThrowProvided()).toThrow(
-        'Initialized without a value and not in a rejected state.'
-      );
+      expect(stateRef.getOrThrowProvided()).toBe(promise);
+      await stateRef.promise;
+      expect(stateRef.getOrThrowProvided()).toBe(promise);
+    });
+    it('Sync getOrThrowProvided', () => {
+      const stateRef = stateRefFromProvided(1);
+      expect(stateRef.getOrThrowProvided()).toBe(1);
+    });
+    it('Failed getOrThrowProvided', () => {
+      const stateRef = stateRefFromError(new Error('failed'));
+      expect(() => stateRef.getOrThrowProvided()).toThrow('failed');
     });
   });
 
   describe('getOrThrowAsync', () => {
-    it('returns the provided value when the status is Resolved', () => {
-      const stateRef = stateRefFromProvided('resolved');
-      expect(stateRef.getOrThrowAsync()).toBe('resolved');
-    });
-    it('returns the provided value when the status is Pending', () => {
-      const promise = new Promise<string>(() => {});
+    it('Async getOrThrowAsync', async () => {
+      const promise = new Promise((resolve) => resolve(1));
       const stateRef = stateRefFromProvided(promise);
-      expect(stateRef.getOrThrowAsync()).toBeInstanceOf(Promise);
+      expect(stateRef.getOrThrowAsync()).toBe(promise);
+      await stateRef.promise;
+      expect(stateRef.getOrThrowAsync()).toBe(1);
     });
-    it('throws an error when the status is Rejected', () => {
-      const stateRef = stateRefFromError(new Error('rejected'));
-      expect(() => stateRef.getOrThrowAsync()).toThrow('rejected');
+    it('Sync getOrThrowAsync', () => {
+      const stateRef = stateRefFromProvided(1);
+      expect(stateRef.getOrThrowAsync()).toBe(1);
+    });
+    it('Failed getOrThrowAsync', () => {
+      const stateRef = stateRefFromError(new Error('failed'));
+      expect(() => stateRef.getOrThrowAsync()).toThrow('failed');
     });
   });
 
   describe('getOrThrowSync', () => {
-    it('returns the provided value when the status is Resolved', () => {
-      const stateRef = stateRefFromProvided('resolved');
-      expect(stateRef.getOrThrowSync(ThrowMode.ErrorOnPending)).toBe(
-        'resolved'
-      );
-    });
-    it('throws an error when the status is Rejected', () => {
-      const stateRef = stateRefFromError(new Error('rejected'));
-      expect(() => stateRef.getOrThrowSync(ThrowMode.ErrorOnPending)).toThrow(
-        'rejected'
-      );
-    });
-    it('throws an error when the status is Pending and mode is ErrorOnPending', () => {
-      const promise = new Promise<string>(() => {});
+    it('Async getOrThrowSync', async () => {
+      const promise = new Promise((resolve) => resolve(1));
       const stateRef = stateRefFromProvided(promise);
       expect(() => stateRef.getOrThrowSync(ThrowMode.ErrorOnPending)).toThrow(
         'Attempted to access a pending state from synchronous code.'
       );
+      let caught = null;
+      try {
+        stateRef.getOrThrowSync(ThrowMode.ThrowPromise);
+      } catch (e) {
+        caught = e;
+      }
+      expect(caught).toBe(promise);
+      await caught;
+      expect(stateRef.getOrThrowSync(ThrowMode.ErrorOnPending)).toBe(1);
+      expect(stateRef.getOrThrowSync(ThrowMode.ThrowPromise)).toBe(1);
     });
-    it('throws the promise when the status is Pending and mode is ThrowPromise', () => {
-      const promise = new Promise<string>(() => {});
-      const stateRef = stateRefFromProvided(promise);
-      expect(() => stateRef.getOrThrowSync(ThrowMode.ThrowPromise)).toThrow();
+    it('Sync getOrThrowSync', () => {
+      const stateRef = stateRefFromProvided(1);
+      expect(stateRef.getOrThrowSync(ThrowMode.ErrorOnPending)).toBe(1);
+      expect(stateRef.getOrThrowSync(ThrowMode.ThrowPromise)).toBe(1);
+    });
+    it('Failed getOrThrowSync', () => {
+      const stateRef = stateRefFromError(new Error('failed'));
+      expect(() => stateRef.getOrThrowSync(ThrowMode.ErrorOnPending)).toThrow(
+        'failed'
+      );
+      expect(() => stateRef.getOrThrowSync(ThrowMode.ThrowPromise)).toThrow(
+        'failed'
+      );
     });
   });
 });
