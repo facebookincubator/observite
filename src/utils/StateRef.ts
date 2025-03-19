@@ -116,7 +116,7 @@ abstract class StateRef<TProvide, TResolve> {
   }
 
   /**
-   * Returns the result or provided value if available.
+   * Returns the result if available, otherwise the provided value.
    * Throws an error only if the status is Status.Rejected.
    */
   getOrThrowAsync(): TProvide | TResolve {
