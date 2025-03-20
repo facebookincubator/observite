@@ -56,7 +56,7 @@ type HolderForProvided<TProvide> = { provided: TProvide };
  * request the same data, and we want to avoid re-fetching data unless something
  * has changed that might alter the outcome.
  */
-abstract class StateRef<TProvide, TResolve> {
+abstract class AbstractStateRef<TResolve, TProvide> {
   private holder: Maybe<HolderForProvided<TProvide>> = null;
   private state: AsyncState<TResolve>;
   private onStatusChanged: Maybe<StatusChangeCB> = null;
@@ -163,12 +163,12 @@ abstract class StateRef<TProvide, TResolve> {
   }
 }
 
-class AsyncStateRef<TResolve> extends StateRef<Promise<TResolve>, TResolve> {
+class AsyncStateRef<
+  TResolve,
+  TProvide extends Promise<TResolve>,
+> extends AbstractStateRef<TResolve, TProvide> {
   promise: Promise<TResolve>;
-  constructor(
-    promise: Promise<TResolve>,
-    onStatusChanged?: Maybe<StatusChangeCB>
-  ) {
+  constructor(promise: TProvide, onStatusChanged?: Maybe<StatusChangeCB>) {
     super(
       { provided: promise },
       { status: Status.Pending, promise },
@@ -190,8 +190,14 @@ class AsyncStateRef<TResolve> extends StateRef<Promise<TResolve>, TResolve> {
   }
 }
 
-class SyncStateRef<TResolve> extends StateRef<TResolve, TResolve> {
-  constructor(result: TResolve, onStatusChanged?: Maybe<StatusChangeCB>) {
+class SyncStateRef<TResolve, TProvide> extends AbstractStateRef<
+  TResolve,
+  TProvide
+> {
+  constructor(
+    result: TProvide & TResolve,
+    onStatusChanged?: Maybe<StatusChangeCB>
+  ) {
     super(
       { provided: result },
       { status: Status.Resolved, result },
@@ -200,37 +206,39 @@ class SyncStateRef<TResolve> extends StateRef<TResolve, TResolve> {
   }
 }
 
-class FailedStateRef<TProvide, TResolve> extends StateRef<TProvide, TResolve> {
+class FailedStateRef<TProvide, TResolve> extends AbstractStateRef<
+  TProvide,
+  TResolve
+> {
   constructor(error: Error) {
     super(null, { status: Status.Rejected, error });
   }
 }
+
+export type StateRef<TResolve, TProvide> =
+  TProvide extends Promise<TResolve>
+    ? AsyncStateRef<TResolve, TProvide>
+    : SyncStateRef<TResolve, TProvide>;
 
 /**
  * Creates a StateRef from a value or a promise of a value.
  * - If a Promise is provided, an AsyncStateRef is created.
  * - Otherwise, a SyncStateRef is created.
  */
-export function stateRefFromProvided<TProvide>(
+export function stateRefFromProvided<TResolve, TProvide>(
   provided: TProvide,
   onStatusChanged?: Maybe<StatusChangeCB>
-): TProvide extends Promise<infer TResolve>
-  ? AsyncStateRef<TResolve>
-  : SyncStateRef<TProvide> {
-  if (isPromise(provided)) {
-    return new AsyncStateRef(
-      provided,
-      onStatusChanged
-    ) as TProvide extends Promise<infer TResolve>
-      ? AsyncStateRef<TResolve>
-      : never;
+): StateRef<TResolve, TProvide> {
+  if (isPromise<TResolve>(provided)) {
+    return new AsyncStateRef(provided, onStatusChanged) as StateRef<
+      TResolve,
+      TProvide
+    >;
   } else {
-    return new SyncStateRef(
-      provided,
+    return new SyncStateRef<TResolve, TProvide>(
+      provided as TProvide & TResolve,
       onStatusChanged
-    ) as TProvide extends Promise<infer _TResolve>
-      ? never
-      : SyncStateRef<TProvide>;
+    ) as StateRef<TResolve, TProvide>;
   }
 }
 
@@ -238,8 +246,11 @@ export function stateRefFromProvided<TProvide>(
  * Creates a StateRef with a rejected status without needing a
  * source value for the error.
  */
-export function stateRefFromError<TProvide, TResolve>(
+export function stateRefFromError<TResolve, TProvide>(
   error: Error
-): StateRef<TProvide, TResolve> {
-  return new FailedStateRef<TProvide, TResolve>(error);
+): StateRef<TResolve, TProvide> {
+  return new FailedStateRef<TResolve, TProvide>(error) as StateRef<
+    TResolve,
+    TProvide
+  >;
 }
