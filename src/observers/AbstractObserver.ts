@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import { AbstractObservable } from '../observables/Observable';
+import { AbstractObservable } from '../observables/AbstractObservable';
 import { isPromise } from '../utils/isPromise';
 import { Maybe } from '../utils/Maybe';
 

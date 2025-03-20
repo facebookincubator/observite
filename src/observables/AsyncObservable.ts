@@ -8,7 +8,7 @@
 import { Maybe } from '../utils/Maybe';
 import { Options, TAbstractObservable } from './AbstractObservable';
 
-export class Observable<T> extends TAbstractObservable<T, T> {
-  static factory = <T>(options?: Maybe<Options<T>>) =>
-    new Observable<T>(options);
+export class AsyncObservable<T> extends TAbstractObservable<Promise<T>, T> {
+  static factory = <T>(options?: Maybe<Options<Promise<T>>>) =>
+    new AsyncObservable(options);
 }
