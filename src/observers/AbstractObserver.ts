@@ -9,9 +9,6 @@ import { AbstractObservable } from '../observables/AbstractObservable';
 import { isPromise } from '../utils/isPromise';
 import { Maybe } from '../utils/Maybe';
 
-type ObservableManager = {
-  addChangedObserver: (observer: AbstractObserver) => void;
-};
 type ObservableOrSelector<_TProvide, _TResolve> = AbstractObservable;
 
 /**
@@ -29,15 +26,23 @@ let nextDebugID = 1;
  * of other Observables.
  */
 export abstract class AbstractObserver {
-  protected creationOrder: number = nextDebugID++;
-  protected debugID: number | string = this.creationOrder;
   private observables: Set<AbstractObservable> = new Set();
   private onChange: Maybe<() => void> = null;
+  private creationOrder: number = nextDebugID++;
+  protected debugID: number | string = this.creationOrder;
+  protected isComponent: boolean = false;
 
   constructor(debugPrefix?: Maybe<string>) {
     if (debugPrefix != null) {
       this.setDebugPrefix(debugPrefix);
     }
+  }
+
+  /**
+   * Should only be called by internal systems.
+   */
+  __getCreationOrder(): number {
+    return this.creationOrder;
   }
 
   setDebugPrefix(prefix: number | string) {
@@ -48,13 +53,21 @@ export abstract class AbstractObserver {
     this.onChange = onChange;
   }
 
-  // Called when the Observer is no longer needed. Cleans up any resources.
+  getIsComponent(): boolean {
+    return this.isComponent;
+  }
+
+  /**
+   * Called when the Observer is no longer needed. Cleans up any resources.
+   */
   destroy() {
     this.onChange = null;
     this.reset();
   }
 
-  // Called to clear subscriptions to all Observables.
+  /**
+   * Called to clear subscriptions to all Observables.
+   */
   reset() {
     this.observables.forEach((observable) => observable.__removeObserver(this));
     this.observables.clear();
@@ -117,7 +130,10 @@ export abstract class AbstractObserver {
     }
   }
 
-  protected observableChanged() {
+  /**
+   * Should only be called by internal systems.
+   */
+  __observableChanged() {
     this.reset();
     this.onChange?.();
   }

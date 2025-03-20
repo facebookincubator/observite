@@ -47,15 +47,7 @@ import {
   stateRefFromProvided,
   Status,
 } from '../utils/StateRef';
-
-// TEMP
-const ObservableManager = {
-  deferredCheckForNoObservers: (observable: AbstractObservable) => {},
-  addChangedObservers: (
-    observable: AbstractObservable,
-    observers: Set<AbstractObserver>
-  ) => {},
-};
+import ObservableManager from '../manager/ObservableManager';
 
 type TimeoutID = ReturnType<typeof setTimeout>;
 
@@ -114,7 +106,7 @@ const DEFAULT_RELEASE_DELAY_MS = 1;
  */
 export abstract class AbstractObservable {
   protected debugID: number | string = nextDebugID++;
-  protected abstract checkForNoObservers(): void;
+  abstract __checkForNoObservers(): void;
   abstract __removeObserver(observer: AbstractObserver): void;
 
   setDebugPrefix = (prefix: number | string) => {
@@ -267,7 +259,7 @@ export abstract class TAbstractObservable<
    * release it after the specified delay. This is used by the ObservableManager
    * to manage state lifecycle based on observer presence.
    */
-  protected checkForNoObservers() {
+  __checkForNoObservers() {
     const ref = this.stateRef;
     const releaseDelay = this.options?.releaseDelay;
     if (
