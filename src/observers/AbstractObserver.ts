@@ -9,8 +9,6 @@ import { AbstractObservable } from '../observables/AbstractObservable';
 import { isPromise } from '../utils/isPromise';
 import { Maybe } from '../utils/Maybe';
 
-type ObservableOrSelector<_TProvide, _TResolve> = AbstractObservable;
-
 /**
  * Static used for creating unique ids for each observable.
  */

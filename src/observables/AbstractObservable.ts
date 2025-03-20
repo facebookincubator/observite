@@ -223,10 +223,9 @@ export abstract class TAbstractObservable<
 
   /**
    * Allows Observers and Observables to access the StateRef for a given key.
+   * Should only be called by internal systems.
    */
-  protected observeRef = (
-    observer: AbstractObserver
-  ): StateRef<TResolve, TProvide> => {
+  __observeRef = (observer: AbstractObserver): StateRef<TResolve, TProvide> => {
     this.addObserver(observer);
     return nullthrows(this.stateRef, 'Observable not initialized');
   };

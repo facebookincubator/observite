@@ -8,7 +8,10 @@
 import { Maybe } from '../utils/Maybe';
 import { Options, TAbstractObservable } from './AbstractObservable';
 
-export class Observable<T> extends TAbstractObservable<T, T> {
-  static factory = <T>(options?: Maybe<Options<T>>) =>
-    new Observable<T>(options);
+export class Observable<TResolve> extends TAbstractObservable<
+  TResolve,
+  TResolve
+> {
+  static factory = <TResolve>(options?: Maybe<Options<TResolve>>) =>
+    new Observable(options);
 }
