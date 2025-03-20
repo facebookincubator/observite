@@ -5,14 +5,14 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+import { AbstractObservable } from '../observables/Observable';
 import { isPromise } from '../utils/isPromise';
 import { Maybe } from '../utils/Maybe';
 
-type Observable = { removeObserver: (observer: AbstractObserver) => void };
 type ObservableManager = {
   addChangedObserver: (observer: AbstractObserver) => void;
 };
-type ObservableOrSelector<_TProvide, _TResolve> = Observable;
+type ObservableOrSelector<_TProvide, _TResolve> = AbstractObservable;
 
 /**
  * Static used for creating unique ids for each observable.
@@ -28,10 +28,10 @@ let nextDebugID = 1;
  * re-evaluating which Observables are relevant, based on the current state
  * of other Observables.
  */
-abstract class AbstractObserver {
+export abstract class AbstractObserver {
   protected creationOrder: number = nextDebugID++;
   protected debugID: number | string = this.creationOrder;
-  private observables: Set<Observable> = new Set();
+  private observables: Set<AbstractObservable> = new Set();
   private onChange: Maybe<() => void> = null;
 
   constructor(debugPrefix?: Maybe<string>) {
@@ -56,7 +56,7 @@ abstract class AbstractObserver {
 
   // Called to clear subscriptions to all Observables.
   reset() {
-    this.observables.forEach((observable) => observable.removeObserver(this));
+    this.observables.forEach((observable) => observable.__removeObserver(this));
     this.observables.clear();
   }
 
@@ -108,7 +108,10 @@ abstract class AbstractObserver {
   //   }
   // };
 
-  protected addObservable(observable: Observable): void {
+  /**
+   * Should only be called by internal systems.
+   */
+  __addObservable(observable: AbstractObservable): void {
     if (this.onChange != null) {
       this.observables.add(observable);
     }

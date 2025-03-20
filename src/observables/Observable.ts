@@ -39,6 +39,7 @@
 
 import { areEqual, ComparisonMethod } from '../utils/areEqual';
 import { Maybe } from '../utils/Maybe';
+import { AbstractObserver } from '../observers/AbstractObserver';
 import { nullthrows } from '../utils/nullthrows';
 import {
   StateRef,
@@ -48,12 +49,11 @@ import {
 } from '../utils/StateRef';
 
 // TEMP
-type Observer = { addObservable: (observable: Observable<any>) => void };
 const ObservableManager = {
   deferredCheckForNoObservers: (observable: Observable<any>) => {},
   addChangedObservers: (
     observable: Observable<any>,
-    observers: Set<Observer>
+    observers: Set<AbstractObserver>
   ) => {},
 };
 
@@ -114,8 +114,8 @@ const DEFAULT_RELEASE_DELAY_MS = 1;
  */
 export abstract class AbstractObservable {
   protected debugID: number | string = nextDebugID++;
-  protected abstract removeObserver(observer: Observer): void;
   protected abstract checkForNoObservers(): void;
+  abstract __removeObserver(observer: AbstractObserver): void;
 
   setDebugPrefix = (prefix: number | string) => {
     this.debugID = `${prefix}::${this.debugID}`;
@@ -133,7 +133,7 @@ export abstract class TAbstractObservable<
   TProvide,
 > extends AbstractObservable {
   private stateRef: Maybe<StateRef<TResolve, TProvide>> = null;
-  private observers: Set<Observer> = new Set();
+  private observers: Set<AbstractObserver> = new Set();
   private options: Options<TProvide>;
   private isDestroyed: boolean = false;
   private releaseTimeoutID: Maybe<TimeoutID> = null;
@@ -232,15 +232,18 @@ export abstract class TAbstractObservable<
   /**
    * Allows Observers and Observables to access the StateRef for a given key.
    */
-  protected observeRef = (observer: Observer): StateRef<TResolve, TProvide> => {
+  protected observeRef = (
+    observer: AbstractObserver
+  ): StateRef<TResolve, TProvide> => {
     this.addObserver(observer);
     return nullthrows(this.stateRef, 'Observable not initialized');
   };
 
   /**
    * Clears the reference count for the specified observer.
+   * Should only be called by internal systems.
    */
-  removeObserver(observer: Observer) {
+  __removeObserver(observer: AbstractObserver) {
     if (!this.observers.has(observer)) {
       return;
     }
@@ -310,10 +313,10 @@ export abstract class TAbstractObservable<
   /**
    * Adds an observer and cancels any pending release.
    */
-  private addObserver(observer: Observer) {
+  private addObserver(observer: AbstractObserver) {
     this.resetReleaseTimeout();
     this.observers.add(observer);
-    observer.addObservable(this);
+    observer.__addObservable(this);
   }
 
   /**
