@@ -51,7 +51,7 @@ import { Maybe } from '@/Maybe';
 
 type TimeoutID = ReturnType<typeof setTimeout>;
 
-enum ReleaseDelay {
+export enum ReleaseDelay {
   Default,
   Never,
 }

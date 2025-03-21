@@ -46,7 +46,10 @@ let nextDebugID = 1;
 export abstract class AbstractSelector<
   TResolve,
   TProvide,
-  TObservable extends TAbstractObservable<TResolve, TProvide>,
+  TObservable extends TAbstractObservable<
+    TResolve,
+    TProvide
+  > = TAbstractObservable<TResolve, TProvide>,
 > {
   private debugID: number | string = nextDebugID++;
   private getState: getStateCB<TResolve, TProvide>;
