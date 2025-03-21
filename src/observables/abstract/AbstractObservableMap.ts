@@ -43,8 +43,8 @@ import { StateRef } from '@/StateRef';
 import {
   Options as ObservableOptions,
   TAbstractObservable,
-} from './AbstractObservable';
-import { Observable } from './Observable';
+} from '@/AbstractObservable';
+import { Observable } from '@/Observable';
 
 enum SetMode {
   NORMAL,

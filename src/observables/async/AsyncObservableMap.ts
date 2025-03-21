@@ -10,8 +10,8 @@ import {
   AbstractObservableMap,
   getDefaultCB,
   Options,
-} from './AbstractObservableMap';
-import { AsyncObservable } from './AsyncObservable';
+} from '@/AbstractObservableMap';
+import { AsyncObservable } from '@/AsyncObservable';
 
 export class AsyncObservableMap<TKey, TValue> extends AbstractObservableMap<
   TKey,

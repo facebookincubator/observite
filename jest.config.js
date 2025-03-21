@@ -1,6 +1,6 @@
 const ts = require('typescript');
 const { pathsToModuleNameMapper } = require('ts-jest');
-// const { compilerOptions } = require('./tsconfig');
+// const { compilerOptions } = require('@/tsconfig');
 const configFileName = ts.findConfigFile(
   "./",
   ts.sys.fileExists,

@@ -6,7 +6,7 @@
  */
 
 import { Maybe } from '@/Maybe';
-import { Options, TAbstractObservable } from './AbstractObservable';
+import { Options, TAbstractObservable } from '@/AbstractObservable';
 
 export class AsyncObservable<TResolve> extends TAbstractObservable<
   TResolve,

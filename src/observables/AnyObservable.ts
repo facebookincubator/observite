@@ -5,10 +5,10 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import { AsyncObservable } from './AsyncObservable';
-import { AsyncObservableMap } from './AsyncObservableMap';
-import { Observable } from './Observable';
-import { ObservableMap } from './ObservableMap';
+import { AsyncObservable } from '@/AsyncObservable';
+import { AsyncObservableMap } from '@/AsyncObservableMap';
+import { Observable } from '@/Observable';
+import { ObservableMap } from '@/ObservableMap';
 
 export type AnyObservable<TResolve> =
   | Observable<TResolve>

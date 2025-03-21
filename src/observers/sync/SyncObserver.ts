@@ -8,7 +8,7 @@
 import { AnyObservable, AnyObservableMap } from '@/AnyObservable';
 import { Maybe } from '@/Maybe';
 import { ThrowMode } from '@/StateRef';
-import { AbstractObserver } from './AbstractObserver';
+import { AbstractObserver } from '@/AbstractObserver';
 
 export class SyncObserver extends AbstractObserver {
   static factory: () => SyncObserver = () => new SyncObserver();

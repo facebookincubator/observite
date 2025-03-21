@@ -7,7 +7,7 @@
 
 import { isPromise } from '@/isPromise';
 import { nullthrows } from '@/nullthrows';
-import { Maybe } from './Maybe';
+import { Maybe } from '@/Maybe';
 
 export enum Status {
   Pending,
