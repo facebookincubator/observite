@@ -5,28 +5,25 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import { Maybe } from '@/Maybe';
-import { ThrowMode } from '@/StateRef';
-import { AbstractObserver } from '@/AbstractObserver';
-import { AnyObservable, AnyObservableMap } from '@/AnyObservable';
 import { TAbstractObservable } from '@/AbstractObservable';
 import { AbstractObservableMap } from '@/AbstractObservableMap';
+import { AbstractObserver } from '@/AbstractObserver';
+import { Maybe } from '@/Maybe';
 
-export class SyncObserver extends AbstractObserver {
-  static factory: () => SyncObserver = () => new SyncObserver();
+export class AsyncObserver extends AbstractObserver {
+  static factory: () => AsyncObserver = () => new AsyncObserver();
 
   observe = <TResolve, TProvide>(
     observable: TAbstractObservable<TResolve, TProvide>
-  ): TResolve => {
+  ): TResolve | TProvide => {
     const ref = observable.__observeRef(this);
-    return ref.getOrThrowSync(ThrowMode.ErrorOnPending);
+    return ref.getOrThrowProvided();
   };
 
   observeKey = <TKey, TResolve, TProvide>(
     observable: AbstractObservableMap<TKey, TResolve, TProvide>,
     key: TKey
-  ): Maybe<TProvide> => {
-    const ref = observable.__observeRef(this, key);
-    return ref?.getOrThrowSync(ThrowMode.ErrorOnPending);
+  ): Maybe<TResolve | TProvide> => {
+    return observable.__observeRef(this, key)?.getOrThrowProvided();
   };
 }

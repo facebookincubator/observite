@@ -43,8 +43,9 @@ import { StateRef } from '@/StateRef';
 import {
   Options as ObservableOptions,
   TAbstractObservable,
-} from '@/AbstractObservable';
+} from './AbstractObservable';
 import { Observable } from '@/Observable';
+import { AnyObserver } from '@/AnyObserver';
 
 enum SetMode {
   NORMAL,
@@ -146,7 +147,7 @@ export abstract class AbstractObservableMap<
    * Should only be accessed internally
    */
   __observeRef = (
-    observer: AbstractObserver,
+    observer: AnyObserver,
     key: TKey
   ): Maybe<StateRef<TResolve, TProvide>> => {
     const map = observer.observe(this.map);

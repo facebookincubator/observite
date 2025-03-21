@@ -34,14 +34,14 @@
     "paths": {
       "@/*": [
         "src/utils/*",
-        "src/observers/*",
         "src/observers/abstract/*",
         "src/observers/async/*",
         "src/observers/sync/*",
-        "src/observables/*",
+        "src/observers/types/*",
         "src/observables/abstract/*",
         "src/observables/async/*",
         "src/observables/sync/*",
+        "src/observables/types/*",
         "src/manager/*"
       ]
     },

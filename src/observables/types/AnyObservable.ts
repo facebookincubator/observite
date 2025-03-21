@@ -11,9 +11,21 @@ import { Observable } from '@/Observable';
 import { ObservableMap } from '@/ObservableMap';
 
 export type AnyObservable<TResolve> =
-  | Observable<TResolve>
-  | AsyncObservable<TResolve>;
+  | AnySyncObservable<TResolve>
+  | AnyAsyncObservable<TResolve>;
+
+export type AnySyncObservable<TResolve> = Observable<TResolve>;
+export type AnyAsyncObservable<TResolve> = AsyncObservable<TResolve>;
 
 export type AnyObservableMap<TKey, TResolve> =
-  | ObservableMap<TKey, TResolve>
-  | AsyncObservableMap<TKey, TResolve>;
+  | AnySyncObservableMap<TKey, TResolve>
+  | AnyAsyncObservableMap<TKey, TResolve>;
+
+export type AnySyncObservableMap<TKey, TResolve> = ObservableMap<
+  TKey,
+  TResolve
+>;
+export type AnyAsyncObservableMap<TKey, TResolve> = AsyncObservableMap<
+  TKey,
+  TResolve
+>;

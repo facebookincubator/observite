@@ -6,7 +6,11 @@
  */
 
 import { AbstractObservable } from '@/AbstractObservable';
-import { AnyObservable, AnyObservableMap } from '@/AnyObservable';
+import {
+  AnyAsyncObservable,
+  AnyObservable,
+  AnyObservableMap,
+} from '@/AnyObservable';
 import { isPromise } from '@/isPromise';
 import { Maybe } from '@/Maybe';
 
@@ -136,10 +140,4 @@ export abstract class AbstractObserver {
     this.reset();
     this.onChange?.();
   }
-
-  abstract observe: <TResolve>(observable: AnyObservable<TResolve>) => TResolve;
-  abstract observeKey: <TKey, TResolve>(
-    observable: AnyObservableMap<TKey, TResolve>,
-    key: TKey
-  ) => Maybe<TResolve>;
 }
