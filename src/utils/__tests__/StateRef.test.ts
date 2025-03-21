@@ -10,7 +10,7 @@ import {
   stateRefFromError,
   Status,
   ThrowMode,
-} from '../StateRef';
+} from '@/StateRef';
 
 describe('StateRef Tests', () => {
   test('should create a SyncStateRef for a non-promise value', () => {

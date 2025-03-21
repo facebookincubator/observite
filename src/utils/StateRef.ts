@@ -5,8 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import { isPromise } from '../utils/isPromise';
-import { nullthrows } from '../utils/nullthrows';
+import { isPromise } from '@/isPromise';
+import { nullthrows } from '@/nullthrows';
 import { Maybe } from './Maybe';
 
 export enum Status {

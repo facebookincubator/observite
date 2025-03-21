@@ -37,17 +37,17 @@
  * />
  */
 
-import { areEqual, ComparisonMethod } from '../utils/areEqual';
-import { Maybe } from '../utils/Maybe';
-import { AbstractObserver } from '../observers/AbstractObserver';
-import { nullthrows } from '../utils/nullthrows';
+import { areEqual, ComparisonMethod } from '@/areEqual';
+import { AbstractObserver } from '@/AbstractObserver';
+import { nullthrows } from '@/nullthrows';
 import {
   StateRef,
   stateRefFromError,
   stateRefFromProvided,
   Status,
-} from '../utils/StateRef';
-import ObservableManager from '../manager/ObservableManager';
+} from '@/StateRef';
+import ObservableManager from '@/ObservableManager';
+import { Maybe } from '@/Maybe';
 
 type TimeoutID = ReturnType<typeof setTimeout>;
 

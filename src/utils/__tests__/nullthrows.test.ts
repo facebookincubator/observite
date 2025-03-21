@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import { nullthrows } from '../nullthrows';
+import { nullthrows } from '@/nullthrows';
 
 test('nullthrows', () => {
   expect(nullthrows(1, 'should not see')).toBe(1);

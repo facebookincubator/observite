@@ -37,8 +37,8 @@
  * completes.
  */
 
-import { AbstractObservable } from '../observables/AbstractObservable';
-import { AbstractObserver } from '../observers/AbstractObserver';
+import { AbstractObservable } from '@/AbstractObservable';
+import { AbstractObserver } from '@/AbstractObserver';
 
 class ObservableManager {
   private isUpdating = false;

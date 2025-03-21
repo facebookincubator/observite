@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import { areEqual, ComparisonMethod } from '../areEqual';
+import { areEqual, ComparisonMethod } from '@/areEqual';
 
 describe('areEqual function', () => {
   test('Exact comparison: identical primitives', () => {

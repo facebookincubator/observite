@@ -8,8 +8,8 @@
 
 'use strict';
 
-import { Observable } from '../observables/Observable';
-import { SyncObserver } from '../observers/SyncObserver';
+import { Observable } from '@/Observable';
+import { SyncObserver } from '@/SyncObserver';
 
 // async test utility function
 function currentEventLoopEnd() {

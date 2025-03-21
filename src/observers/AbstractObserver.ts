@@ -5,10 +5,10 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import { AbstractObservable } from '../observables/AbstractObservable';
-import { AnyObservable, AnyObservableMap } from '../observables/AnyObservable';
-import { isPromise } from '../utils/isPromise';
-import { Maybe } from '../utils/Maybe';
+import { AbstractObservable } from '@/AbstractObservable';
+import { AnyObservable, AnyObservableMap } from '@/AnyObservable';
+import { isPromise } from '@/isPromise';
+import { Maybe } from '@/Maybe';
 
 /**
  * Static used for creating unique ids for each observable.

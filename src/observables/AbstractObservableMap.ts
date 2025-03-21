@@ -36,10 +36,10 @@
  *   .map(([systemID, system]) => system.name ?? systemID);
  */
 
-import { AbstractObserver } from '../observers/AbstractObserver';
-import { Maybe } from '../utils/Maybe';
-import { nullthrows } from '../utils/nullthrows';
-import { StateRef } from '../utils/StateRef';
+import { AbstractObserver } from '@/AbstractObserver';
+import { Maybe } from '@/Maybe';
+import { nullthrows } from '@/nullthrows';
+import { StateRef } from '@/StateRef';
 import {
   Options as ObservableOptions,
   TAbstractObservable,

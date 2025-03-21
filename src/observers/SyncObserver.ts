@@ -5,9 +5,9 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import { AnyObservable, AnyObservableMap } from '../observables/AnyObservable';
-import { Maybe } from '../utils/Maybe';
-import { ThrowMode } from '../utils/StateRef';
+import { AnyObservable, AnyObservableMap } from '@/AnyObservable';
+import { Maybe } from '@/Maybe';
+import { ThrowMode } from '@/StateRef';
 import { AbstractObserver } from './AbstractObserver';
 
 export class SyncObserver extends AbstractObserver {
