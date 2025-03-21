@@ -154,31 +154,3 @@ export abstract class AbstractSelector<
     }
   };
 }
-
-// export class AsyncSelector<T> extends AbstractSelector<Promise<T>, T> {
-//   static factory: (
-//     getStateCB<Promise<T>, T>,
-//     ?Options<Promise<T>>,
-//   ) => AsyncSelector<T> = (getState, options) =>
-//     new AsyncSelector(getState, options);
-
-//   constructor(
-//     getState: getStateCB<Promise<T>, T>,
-//     options?: ?Options<Promise<T>>,
-//   ) {
-//     // $FlowFixMe[incompatible-call]
-//     super(getState, options, AsyncObserver.factory, AsyncObservable.factory);
-//   }
-// }
-
-// export class Selector<T> extends AbstractSelector<T, T> {
-//   static factory: (getStateCB<T, T>, ?Options<T>) => Selector<T> = (
-//     getState,
-//     options,
-//   ) => new Selector(getState, options);
-
-//   constructor(getState: getStateCB<T, T>, options?: ?Options<T>) {
-//     // $FlowFixMe[incompatible-call]
-//     super(getState, options, SyncObserver.factory, Observable.factory);
-//   }
-// }
