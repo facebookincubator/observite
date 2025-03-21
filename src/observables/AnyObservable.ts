@@ -6,12 +6,14 @@
  */
 
 import { AsyncObservable } from './AsyncObservable';
+import { AsyncObservableMap } from './AsyncObservableMap';
 import { Observable } from './Observable';
+import { ObservableMap } from './ObservableMap';
 
 export type AnyObservable<TResolve> =
   | Observable<TResolve>
   | AsyncObservable<TResolve>;
 
-export type AnyObservableMap<_Key, TResolve> =
-  | Observable<TResolve>
-  | AsyncObservable<TResolve>;
+export type AnyObservableMap<TKey, TResolve> =
+  | ObservableMap<TKey, TResolve>
+  | AsyncObservableMap<TKey, TResolve>;
