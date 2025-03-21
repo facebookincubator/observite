@@ -206,9 +206,9 @@ class SyncStateRef<TResolve, TProvide> extends AbstractStateRef<
   }
 }
 
-class FailedStateRef<TProvide, TResolve> extends AbstractStateRef<
-  TProvide,
-  TResolve
+class FailedStateRef<TResolve, TProvide> extends AbstractStateRef<
+  TResolve,
+  TProvide
 > {
   constructor(error: Error) {
     super(null, { status: Status.Rejected, error });

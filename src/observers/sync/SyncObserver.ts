@@ -3,6 +3,8 @@
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
+ *
+ * Use when you only need to observe synchronous observables.
  */
 
 import { Maybe } from '@/Maybe';
@@ -25,7 +27,7 @@ export class SyncObserver extends AbstractObserver {
   observeKey = <TKey, TResolve, TProvide>(
     observable: AbstractObservableMap<TKey, TResolve, TProvide>,
     key: TKey
-  ): Maybe<TProvide> => {
+  ): Maybe<TResolve> => {
     const ref = observable.__observeRef(this, key);
     return ref?.getOrThrowSync(ThrowMode.ErrorOnPending);
   };

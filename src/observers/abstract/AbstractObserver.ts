@@ -76,8 +76,8 @@ export abstract class AbstractObserver {
     this.observables.clear();
   }
 
-  //   observeState = <TProvide, TResolve>(
-  //     observable: ObservableOrSelector<TProvide, TResolve>
+  //   observeState = <TResolve, TProvide>(
+  //     observable: ObservableOrSelector<TResolve, TProvide>
   //   ): AsyncState<TResolve> => {
   //     try {
   //       return LoadObject.withValue(
@@ -96,11 +96,11 @@ export abstract class AbstractObserver {
   //     }
   //   };
 
-  // observeLoadObjectKey: <TKey, TProvide, TResolve>(
-  //   ObservableOrSelectorMap<TKey, TProvide, TResolve>,
+  // observeLoadObjectKey: <TKey, TResolve, TProvide>(
+  //   ObservableOrSelectorMap<TKey, TResolve, TProvide>,
   //   TKey,
-  // ) => LoadObject<?TResolve> = <TKey, TProvide, TResolve>(
-  //   observable: ObservableOrSelectorMap<TKey, TProvide, TResolve>,
+  // ) => LoadObject<?TResolve> = <TKey, TResolve, TProvide>(
+  //   observable: ObservableOrSelectorMap<TKey, TResolve, TProvide>,
   //   key: TKey,
   // ): LoadObject<?TResolve> => {
   //   try {

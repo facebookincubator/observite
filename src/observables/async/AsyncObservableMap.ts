@@ -13,16 +13,15 @@ import {
 } from '@/AbstractObservableMap';
 import { AsyncObservable } from '@/AsyncObservable';
 
-export class AsyncObservableMap<TKey, TValue> extends AbstractObservableMap<
+export class AsyncObservableMap<TKey, TResolve> extends AbstractObservableMap<
   TKey,
-  Promise<TValue>,
-  TValue
+  TResolve,
+  Promise<TResolve>
 > {
   constructor(
-    getDefault?: Maybe<getDefaultCB<TKey, Promise<TValue>>>,
-    valueOptions?: Maybe<Options<TKey, Promise<TValue>>>
+    getDefault?: Maybe<getDefaultCB<TKey, Promise<TResolve>>>,
+    valueOptions?: Maybe<Options<TKey, Promise<TResolve>>>
   ) {
-    // $FlowFixMe[incompatible-call]
     super(getDefault, valueOptions, AsyncObservable.factory);
   }
 

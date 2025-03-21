@@ -67,8 +67,8 @@ export type Options<TKey, TProvide> = ObservableOptions<TProvide> &
 
 export abstract class AbstractObservableMap<
   TKey,
-  TProvide,
   TResolve,
+  TProvide,
   TObservable extends TAbstractObservable<
     TResolve,
     TProvide
