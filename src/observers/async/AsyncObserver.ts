@@ -8,23 +8,22 @@
  * asynchronous observables.
  */
 
-import { TAbstractObservable } from '@/AbstractObservable';
-import { AbstractObservableMap } from '@/AbstractObservableMap';
 import { AbstractObserver } from '@/AbstractObserver';
+import { AnyObservable, AnyObservableMap } from '@/AnyObservable';
 import { Maybe } from '@/Maybe';
 
 export class AsyncObserver extends AbstractObserver {
   static factory: () => AsyncObserver = () => new AsyncObserver();
 
   observe = <TResolve, TProvide>(
-    observable: TAbstractObservable<TResolve, TProvide>
+    observable: AnyObservable<TResolve, TProvide>
   ): TResolve | TProvide => {
     const ref = observable.__observeRef(this);
     return ref.getOrThrowProvided();
   };
 
   observeKey = <TKey, TResolve, TProvide>(
-    observable: AbstractObservableMap<TKey, TResolve, TProvide>,
+    observable: AnyObservableMap<TKey, TResolve, TProvide>,
     key: TKey
   ): Maybe<TResolve | TProvide> => {
     return observable.__observeRef(this, key)?.getOrThrowProvided();

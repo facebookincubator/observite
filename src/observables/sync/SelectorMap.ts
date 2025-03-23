@@ -13,14 +13,14 @@ import {
 import { Maybe } from '@/Maybe';
 import { Selector } from '@/Selector';
 
-export class SelectorMap<TKey, TResolve> extends AbstractSelectorMap<
+export class SelectorMap<
   TKey,
   TResolve,
-  TResolve
-> {
+  TProvide extends TResolve = TResolve,
+> extends AbstractSelectorMap<TKey, TResolve, TProvide> {
   constructor(
-    getState: getStateCB<TKey, TResolve>,
-    options?: Maybe<Options<TKey, TResolve>>
+    getState: getStateCB<TKey, TProvide>,
+    options?: Maybe<Options<TKey, TProvide>>
   ) {
     super(getState, options, Selector.factory);
   }

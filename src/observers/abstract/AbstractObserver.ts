@@ -6,12 +6,6 @@
  */
 
 import { AbstractObservable } from '@/AbstractObservable';
-import {
-  AnyAsyncObservable,
-  AnyObservable,
-  AnyObservableMap,
-} from '@/AnyObservable';
-import { isPromise } from '@/isPromise';
 import { Maybe } from '@/Maybe';
 
 /**

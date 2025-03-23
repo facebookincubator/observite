@@ -30,19 +30,23 @@ import {
 } from '@/AbstractSelector';
 import { Maybe } from '@/Maybe';
 import { StateRef } from '@/StateRef';
+import { AnyObserver } from '@/AnyObserver';
 
 /**
  * Callback that selects state for a given key
  */
 export type getStateCB<TKey, TProvide> = (
-  Observer: AbstractObserver,
+  Observer: AnyObserver,
   TKey: TKey
 ) => TProvide;
 
 /**
  * Same options as observable however the release function needs a key
  */
-export type Options<TKey, TProvide> = ObservableOptions<TProvide> &
+export type Options<TKey, TProvide> = Omit<
+  ObservableOptions<TProvide>,
+  'onRelease'
+> &
   Partial<{
     onRelease: (key: TKey, provide: TProvide) => void;
   }>;

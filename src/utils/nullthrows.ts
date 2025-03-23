@@ -7,9 +7,9 @@
 
 import { Maybe } from '@/Maybe';
 
-export function nullthrows<T = unknown>(value: Maybe<T>, message: string): T {
+export function nullthrows<T = unknown>(value: Maybe<T>, message?: string): T {
   if (value != null) {
     return value;
   }
-  throw new Error(message);
+  throw new Error(message ?? 'Got unexpected null or undefined');
 }

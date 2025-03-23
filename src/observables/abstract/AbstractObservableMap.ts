@@ -60,7 +60,10 @@ export type getDefaultCB<TKey, TProvide> = (key: TKey) => TProvide;
 /**
  * Options are the same as for an Observable, but onRelease needs to include a key
  */
-export type Options<TKey, TProvide> = ObservableOptions<TProvide> &
+export type Options<TKey, TProvide> = Omit<
+  ObservableOptions<TProvide>,
+  'onRelease'
+> &
   Partial<{
     onRelease: (key: TKey, provide: TProvide) => void;
   }>;

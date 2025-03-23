@@ -7,8 +7,37 @@
 
 'use strict';
 
+import { AsyncSelector } from '@/AsyncSelector';
+import { nullthrows } from '@/nullthrows';
 import { Observable } from '@/Observable';
+import { Selector } from '@/Selector';
+import { SelectorMap } from '@/SelectorMap';
 import { SyncObserver } from '@/SyncObserver';
+
+type Loadable<T> = LoadSuccess<T> | LoadFailed | Loading;
+
+type LoadSuccess<T> = Readonly<{
+  status: 'LoadSuccess';
+  data: T;
+}>;
+
+type LoadFailed = Readonly<{
+  status: 'LoadFailed';
+  errors: Set<Error>;
+}>;
+
+type Loading = Readonly<{
+  status: 'Loading';
+  promise: Promise<void>;
+}>;
+
+function loading(promise: Promise<void>): Loading {
+  return { status: 'Loading', promise };
+}
+
+function loadSuccess<T>(data: T): Loadable<T> {
+  return { status: 'LoadSuccess', data };
+}
 
 // async test utility function
 function currentEventLoopEnd() {
@@ -19,90 +48,83 @@ function currentEventLoopEnd() {
 const DEFAULT_SIZE_OF_UNIVERSE = 94;
 class UniverseStore {
   // Simple Observable for testing basic sets and updates
-  size: Observable<number> = new Observable({
+  size = new Observable<number>({
     default: DEFAULT_SIZE_OF_UNIVERSE,
     debugID: 'UniverseStore::size',
   });
 }
 
-// const starMap: { [string]: Array<string> } = {
-//   MilkyWay: ['Sol', 'Proxima Centauri'],
-//   Andromeda: ['Alpheratz'],
-// };
+const starMap: Record<string, Array<string>> = {
+  MilkyWay: ['Sol', 'Proxima Centauri'],
+  Andromeda: ['Alpheratz'],
+};
 
-// class GalaxyStore {
-//   __releaseCount = 0;
-//   // Sync Selector for testing
-//   galaxies: SelectorMap<string, Array<string>> = new SelectorMap(
-//     (_, galaxyName) => starMap[galaxyName],
-//     {
-//       debugID: 'GalaxyStore::galaxies',
-//     }
-//   );
-// }
+class GalaxyStore {
+  __releaseCount = 0;
+  // Sync Selector for testing
+  galaxies = new SelectorMap<string, Array<string>>(
+    (_, galaxyName) => starMap[galaxyName],
+    {
+      debugID: 'GalaxyStore::galaxies',
+    }
+  );
+}
 
-// class StarStore {
-//   // Would probably be more normal to use an ObservableMap for this kind of
-//   // thing however want to test releasing of stored data so using an Observable
-//   // and a SelectorMap into that Observable's data.
-//   starData: Observable<{ [string]: Loadable<string> }> = new Observable<{
-//     [string]: Loadable<string>;
-//   }>({
-//     default: {},
-//     debugID: 'StarStore::starData',
-//   });
-//   stars: SelectorMap<string, Loadable<string>> = new SelectorMap<
-//     string,
-//     Loadable<string>
-//   >(
-//     ({ observe }, starName) => {
-//       console.log('getState', starName);
-//       const loadedStars = observe(this.starData);
-//       if (loadedStars[starName] == null) {
-//         loadedStars[starName] = loading(
-//           new Promise((resolve) => {
-//             setTimeout(() => {
-//               this.starData.set({
-//                 ...nullthrows(this.starData.peek()),
-//                 [starName]: loadSuccess(starName),
-//               });
-//               resolve();
-//             }, starName.length);
-//           })
-//         );
-//       }
-//       return loadedStars[starName];
-//     },
-//     {
-//       debugID: 'StarStore::stars',
-//       releaseDelay: numberToMillisecond(50),
-//       onRelease: (starName) => {
-//         console.log('onRelease', starName);
-//         const starData = { ...nullthrows(this.starData.peek()) };
-//         delete starData[starName];
-//         this.starData.set(starData);
-//       },
-//     }
-//   );
+class StarStore {
+  // Would probably be more normal to use an ObservableMap for this kind of
+  // thing however want to test releasing of stored data so using an Observable
+  // and a SelectorMap into that Observable's data.
+  starData = new Observable<Record<string, Loadable<string>>>({
+    default: {},
+    debugID: 'StarStore::starData',
+  });
+  stars = new SelectorMap<string, Loadable<string>>(
+    ({ observe }, starName) => {
+      console.log('getState', starName);
+      const loadedStars = observe(this.starData);
+      if (loadedStars[starName] == null) {
+        loadedStars[starName] = loading(
+          new Promise((resolve) => {
+            setTimeout(() => {
+              this.starData.set({
+                ...nullthrows(this.starData.peek()),
+                [starName]: loadSuccess(starName),
+              });
+              resolve();
+            }, starName.length);
+          })
+        );
+      }
+      return loadedStars[starName];
+    },
+    {
+      debugID: 'StarStore::stars',
+      releaseDelay: 50,
+      onRelease: (starName) => {
+        console.log('onRelease', starName);
+        const starData = { ...nullthrows(this.starData.peek()) };
+        delete starData[starName];
+        this.starData.set(starData);
+      },
+    }
+  );
 
-//   extraStarData: AsyncSelector<string> = new AsyncSelector<string, string>(
-//     async () => {
-//       const timeout = new Promise((resolve) => setTimeout(resolve, 10));
-//       await timeout;
-//       return 'Ardos';
-//     }
-//   );
+  extraStarData = new AsyncSelector<string>(async () => {
+    const timeout = new Promise((resolve) => setTimeout(resolve, 10));
+    await timeout;
+    return 'Ardos';
+  });
 
-//   extraStar: Selector<string> = new Selector<string>(
-//     ({ observeLoadObject }) => {
-//       const result = observeLoadObject(this.extraStarData);
-//       if (!result.hasValue()) {
-//         return 'IsLoading';
-//       }
-//       return nullthrows(result.getValue());
-//     }
-//   );
-// }
+  // extraStar = new Selector<string>(
+  //   ({ observeLoadObject }) => {
+  //     const result = observeLoadObject(this.extraStarData);
+  //     if (!result.hasValue()) {
+  //       return 'IsLoading';
+  //     }
+  //     return nullthrows(result.getValue());
+  //   }
+  // );
+}
 
 describe('Observite Integration Tests', () => {
   beforeAll(async () => {
@@ -112,77 +134,30 @@ describe('Observite Integration Tests', () => {
     jest.useRealTimers();
   });
 
-  test('Observable Basics', async () => {
-    const universeStore = new UniverseStore();
-    const observer = new SyncObserver();
-    let onChangeCount = 0;
-    let size: number;
-    observer.setOnChange(() => {
-      console.log('onChange');
-      size = observer.observe(universeStore.size);
-      onChangeCount++;
-    });
-    size = observer.observe(universeStore.size);
-    await currentEventLoopEnd();
-    expect(onChangeCount).toBe(0);
-    expect(size).toBe(DEFAULT_SIZE_OF_UNIVERSE);
-
-    let newSize = size + 1;
-    universeStore.size.set(newSize);
-    console.log('Initially we should have fetched state once with no changes');
-    await currentEventLoopEnd();
-    expect(onChangeCount).toBe(1);
-    expect(size).toBe(newSize);
-    console.log('Set that causes no change, one more check but no change');
-    universeStore.size.set(newSize);
-    await currentEventLoopEnd();
-    expect(onChangeCount).toBe(1);
-    expect(size).toBe(newSize);
-    console.log('Changes after we stop observing are ignored');
-    observer.destroy();
-    await currentEventLoopEnd();
-    await currentEventLoopEnd();
-    newSize = size + 1;
-    universeStore.size.set(newSize);
-    await currentEventLoopEnd();
-    expect(onChangeCount).toBe(1);
-    expect(size).toBe(newSize - 1);
-  });
   // test('Observable Basics', async () => {
   //   const universeStore = new UniverseStore();
-  //   console.log('Init...');
-  //   let getStateCount = 0;
-  //   let onChangeCount = 0;
-  //   const sizeSelector = new Selector<number>(({ observe }) => {
-  //     getStateCount++;
-  //     const newState = observe(universeStore.size);
-  //     console.log('getState', newState);
-  //     return newState;
-  //   });
   //   const observer = new SyncObserver();
+  //   let onChangeCount = 0;
   //   let size: number;
   //   observer.setOnChange(() => {
   //     console.log('onChange');
-  //     size = observer.observe(sizeSelector);
+  //     size = observer.observe(universeStore.size);
   //     onChangeCount++;
   //   });
-  //   size = observer.observe(sizeSelector);
-  //   console.log('Initially we should have fetched state once with no changes');
+  //   size = observer.observe(universeStore.size);
   //   await currentEventLoopEnd();
-  //   expect(getStateCount).toBe(1);
   //   expect(onChangeCount).toBe(0);
   //   expect(size).toBe(DEFAULT_SIZE_OF_UNIVERSE);
-  //   console.log('After a change, one more fetch of state and one change');
+
   //   let newSize = size + 1;
   //   universeStore.size.set(newSize);
+  //   console.log('Initially we should have fetched state once with no changes');
   //   await currentEventLoopEnd();
-  //   expect(getStateCount).toBe(2);
   //   expect(onChangeCount).toBe(1);
   //   expect(size).toBe(newSize);
   //   console.log('Set that causes no change, one more check but no change');
   //   universeStore.size.set(newSize);
   //   await currentEventLoopEnd();
-  //   expect(getStateCount).toBe(2);
   //   expect(onChangeCount).toBe(1);
   //   expect(size).toBe(newSize);
   //   console.log('Changes after we stop observing are ignored');
@@ -192,10 +167,58 @@ describe('Observite Integration Tests', () => {
   //   newSize = size + 1;
   //   universeStore.size.set(newSize);
   //   await currentEventLoopEnd();
-  //   expect(getStateCount).toBe(2);
   //   expect(onChangeCount).toBe(1);
   //   expect(size).toBe(newSize - 1);
   // });
+
+  test('Observable Basics', async () => {
+    const universeStore = new UniverseStore();
+    console.log('Init...');
+    let getStateCount = 0;
+    let onChangeCount = 0;
+    const sizeSelector = new Selector<number>(({ observe }) => {
+      getStateCount++;
+      const newState = observe(universeStore.size);
+      console.log('getState', newState);
+      return newState;
+    });
+    const observer = new SyncObserver();
+    let size: number;
+    observer.setOnChange(() => {
+      console.log('onChange');
+      size = observer.observe(sizeSelector);
+      onChangeCount++;
+    });
+    size = observer.observe(sizeSelector);
+    console.log('Initially we should have fetched state once with no changes');
+    await currentEventLoopEnd();
+    expect(getStateCount).toBe(1);
+    expect(onChangeCount).toBe(0);
+    expect(size).toBe(DEFAULT_SIZE_OF_UNIVERSE);
+    console.log('After a change, one more fetch of state and one change');
+    let newSize = size + 1;
+    universeStore.size.set(newSize);
+    await currentEventLoopEnd();
+    expect(getStateCount).toBe(2);
+    expect(onChangeCount).toBe(1);
+    expect(size).toBe(newSize);
+    console.log('Set that causes no change, one more check but no change');
+    universeStore.size.set(newSize);
+    await currentEventLoopEnd();
+    expect(getStateCount).toBe(2);
+    expect(onChangeCount).toBe(1);
+    expect(size).toBe(newSize);
+    console.log('Changes after we stop observing are ignored');
+    observer.destroy();
+    await currentEventLoopEnd();
+    await currentEventLoopEnd();
+    newSize = size + 1;
+    universeStore.size.set(newSize);
+    await currentEventLoopEnd();
+    expect(getStateCount).toBe(2);
+    expect(onChangeCount).toBe(1);
+    expect(size).toBe(newSize - 1);
+  });
   // test('Resource Maps', async () => {
   //   const galaxyStore = new GalaxyStore();
   //   const starStore = new StarStore();
@@ -249,7 +272,9 @@ describe('Observite Integration Tests', () => {
   //   await currentEventLoopEnd();
   //   expect(starStore.starData.peek()?.Sol).not.toBeUndefined();
   //   expect(starStore.starData.peek()?.['Proxima Centauri']).not.toBeUndefined();
-  //   console.log('Relistening and Advancing Time: Data should still be held onto');
+  //   console.log(
+  //     'Relistening and Advancing Time: Data should still be held onto'
+  //   );
   //   observer.setOnChange(() => {});
   //   observer.observe(starsSelector);
   //   jest.advanceTimersByTime(100);

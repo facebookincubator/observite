@@ -13,14 +13,14 @@ import {
 } from '@/AbstractObservableMap';
 import { Observable } from '@/Observable';
 
-export class ObservableMap<TKey, TValue> extends AbstractObservableMap<
+export class ObservableMap<
   TKey,
-  TValue,
-  TValue
-> {
+  TResolve,
+  TProvide extends TResolve = TResolve,
+> extends AbstractObservableMap<TKey, TResolve, TProvide> {
   constructor(
-    getDefault?: Maybe<getDefaultCB<TKey, TValue>>,
-    valueOptions?: Maybe<Options<TKey, TValue>>
+    getDefault?: Maybe<getDefaultCB<TKey, TProvide>>,
+    valueOptions?: Maybe<Options<TKey, TProvide>>
   ) {
     super(getDefault, valueOptions, Observable.factory);
   }
@@ -28,11 +28,11 @@ export class ObservableMap<TKey, TValue> extends AbstractObservableMap<
   // /**
   //  * Convenience selector that can be used to access all items in the map
   //  */
-  // entries: Selector<Array<[TKey, TValue]>> = new Selector<
-  //   Array<[TKey, TValue]>
+  // entries: Selector<Array<[TKey, TResolve]>> = new Selector<
+  //   Array<[TKey, TResolve]>
   // >(({ observe }: Observer) => {
   //   const map = observe(this.map);
-  //   return Array.from(map.entries()).map<[TKey, TValue], void>(
+  //   return Array.from(map.entries()).map<[TKey, TResolve], void>(
   //     ([key, observable]) => [key, observe(observable)]
   //   );
   // });

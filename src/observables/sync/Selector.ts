@@ -11,15 +11,18 @@ import { Maybe } from '@/Maybe';
 import { SyncObserver } from '@/SyncObserver';
 import { Observable } from '@/Observable';
 
-export class Selector<TResolve> extends AbstractSelector<TResolve, TResolve> {
-  static factory = <TResolve>(
-    getState: getStateCB<TResolve, TResolve>,
-    options: Maybe<Options<TResolve>>
-  ) => new Selector<TResolve>(getState, options);
+export class Selector<
+  TResolve,
+  TProvide extends TResolve = TResolve,
+> extends AbstractSelector<TResolve, TProvide> {
+  static factory = <TResolve, TProvide extends TResolve = TResolve>(
+    getState: getStateCB<TResolve, TProvide>,
+    options: Maybe<Options<TProvide>>
+  ) => new Selector<TResolve, TProvide>(getState, options);
 
   constructor(
-    getState: getStateCB<TResolve, TResolve>,
-    options?: Maybe<Options<TResolve>>
+    getState: getStateCB<TResolve, TProvide>,
+    options?: Maybe<Options<TProvide>>
   ) {
     super(getState, options, SyncObserver.factory, Observable.factory);
   }

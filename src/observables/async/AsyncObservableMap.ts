@@ -13,14 +13,14 @@ import {
 } from '@/AbstractObservableMap';
 import { AsyncObservable } from '@/AsyncObservable';
 
-export class AsyncObservableMap<TKey, TResolve> extends AbstractObservableMap<
+export class AsyncObservableMap<
   TKey,
   TResolve,
-  Promise<TResolve>
-> {
+  TProvide extends Promise<TResolve> = Promise<TResolve>,
+> extends AbstractObservableMap<TKey, TResolve, TProvide> {
   constructor(
-    getDefault?: Maybe<getDefaultCB<TKey, Promise<TResolve>>>,
-    valueOptions?: Maybe<Options<TKey, Promise<TResolve>>>
+    getDefault?: Maybe<getDefaultCB<TKey, TProvide>>,
+    valueOptions?: Maybe<Options<TKey, TProvide>>
   ) {
     super(getDefault, valueOptions, AsyncObservable.factory);
   }
@@ -28,12 +28,12 @@ export class AsyncObservableMap<TKey, TResolve> extends AbstractObservableMap<
   // /**
   //  * Convenience selector that can be used to access all items in the map
   //  */
-  // entries: AsyncSelector<Array<[TKey, TValue]>> = new AsyncSelector<
-  //   Array<[TKey, TValue]>
+  // entries: AsyncSelector<Array<[TKey, TResolve]>> = new AsyncSelector<
+  //   Array<[TKey, TResolve]>
   // >(({ observe }: Observer) => {
   //   const map = observe(this.map);
   //   return Promise.all(
-  //     Array.from(map.entries()).map<Promise<[TKey, TValue]>, void>(
+  //     Array.from(map.entries()).map<Promise<[TKey, TResolve]>, void>(
   //       async ([key, observable]) => [key, await observe(observable)]
   //     )
   //   );

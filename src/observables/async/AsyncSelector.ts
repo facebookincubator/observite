@@ -11,18 +11,21 @@ import { AsyncObserver } from '@/AsyncObserver';
 import { Maybe } from '@/Maybe';
 import { AsyncObservable } from '@/AsyncObservable';
 
-export class AsyncSelector<TResolve> extends AbstractSelector<
+export class AsyncSelector<
   TResolve,
-  Promise<TResolve>
-> {
-  static factory = <TResolve>(
-    getState: getStateCB<TResolve, Promise<TResolve>>,
-    options: Maybe<Options<Promise<TResolve>>>
-  ) => new AsyncSelector<TResolve>(getState, options);
+  TProvide extends Promise<TResolve> = Promise<TResolve>,
+> extends AbstractSelector<TResolve, TProvide> {
+  static factory = <
+    TResolve,
+    TProvide extends Promise<TResolve> = Promise<TResolve>,
+  >(
+    getState: getStateCB<TResolve, TProvide>,
+    options: Maybe<Options<TProvide>>
+  ) => new AsyncSelector<TResolve, TProvide>(getState, options);
 
   constructor(
-    getState: getStateCB<TResolve, Promise<TResolve>>,
-    options?: Maybe<Options<Promise<TResolve>>>
+    getState: getStateCB<TResolve, TProvide>,
+    options?: Maybe<Options<TProvide>>
   ) {
     super(getState, options, AsyncObserver.factory, AsyncObservable.factory);
   }

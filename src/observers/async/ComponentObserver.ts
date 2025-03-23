@@ -10,9 +10,9 @@
  * <Suspense> wrapper that catches promises and renders a loading state.
  */
 
-import { AbstractObservable, TAbstractObservable } from '@/AbstractObservable';
-import { AbstractObservableMap } from '@/AbstractObservableMap';
+import { AbstractObservable } from '@/AbstractObservable';
 import { AbstractObserver } from '@/AbstractObserver';
+import { AnyObservable, AnyObservableMap } from '@/AnyObservable';
 import { Maybe } from '@/Maybe';
 import ObservableManager from '@/ObservableManager';
 import { ThrowMode } from '@/StateRef';
@@ -22,12 +22,12 @@ export class ComponentObserver extends AbstractObserver {
   static factory: () => ComponentObserver = () => new ComponentObserver();
 
   observe = <TResolve, TProvide>(
-    observable: TAbstractObservable<TResolve, TProvide>
+    observable: AnyObservable<TResolve, TProvide>
   ): TResolve => {
     return observable.__observeRef(this).getOrThrowSync(ThrowMode.ThrowPromise);
   };
   observeKey = <TKey, TResolve, TProvide>(
-    observable: AbstractObservableMap<TKey, TResolve, TProvide>,
+    observable: AnyObservableMap<TKey, TResolve, TProvide>,
     key: TKey
   ): Maybe<TResolve> => {
     const ref = observable.__observeRef(this, key);

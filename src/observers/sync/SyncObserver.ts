@@ -11,21 +11,19 @@ import { Maybe } from '@/Maybe';
 import { ThrowMode } from '@/StateRef';
 import { AbstractObserver } from '@/AbstractObserver';
 import { AnyObservable, AnyObservableMap } from '@/AnyObservable';
-import { TAbstractObservable } from '@/AbstractObservable';
-import { AbstractObservableMap } from '@/AbstractObservableMap';
 
 export class SyncObserver extends AbstractObserver {
   static factory: () => SyncObserver = () => new SyncObserver();
 
   observe = <TResolve, TProvide>(
-    observable: TAbstractObservable<TResolve, TProvide>
+    observable: AnyObservable<TResolve, TProvide>
   ): TResolve => {
     const ref = observable.__observeRef(this);
     return ref.getOrThrowSync(ThrowMode.ErrorOnPending);
   };
 
   observeKey = <TKey, TResolve, TProvide>(
-    observable: AbstractObservableMap<TKey, TResolve, TProvide>,
+    observable: AnyObservableMap<TKey, TResolve, TProvide>,
     key: TKey
   ): Maybe<TResolve> => {
     const ref = observable.__observeRef(this, key);

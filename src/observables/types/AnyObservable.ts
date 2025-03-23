@@ -12,27 +12,34 @@ import { Observable } from '@/Observable';
 import { ObservableMap } from '@/ObservableMap';
 import { Selector } from '@/Selector';
 
-export type AnyObservable<TResolve> =
-  | AnySyncObservable<TResolve>
-  | AnyAsyncObservable<TResolve>;
+export type AnyObservable<TResolve, TProvide> = TProvide extends TResolve
+  ? AnySyncObservable<TResolve, TProvide>
+  : TProvide extends Promise<TResolve>
+    ? AnyAsyncObservable<TResolve, TProvide>
+    : never;
 
-export type AnySyncObservable<TResolve> =
-  | Observable<TResolve>
-  | Selector<TResolve>;
+export type AnySyncObservable<TResolve, TProvide extends TResolve> =
+  | Observable<TResolve, TProvide>
+  | Selector<TResolve, TProvide>;
 
-export type AnyAsyncObservable<TResolve> =
-  | AsyncObservable<TResolve>
-  | AsyncSelector<TResolve>;
+export type AnyAsyncObservable<TResolve, TProvide extends Promise<TResolve>> =
+  | AsyncObservable<TResolve, TProvide>
+  | AsyncSelector<TResolve, TProvide>;
 
-export type AnyObservableMap<TKey, TResolve> =
-  | AnySyncObservableMap<TKey, TResolve>
-  | AnyAsyncObservableMap<TKey, TResolve>;
+export type AnyObservableMap<TKey, TResolve, TProvide> =
+  TProvide extends TResolve
+    ? AnySyncObservableMap<TKey, TResolve, TProvide>
+    : TProvide extends Promise<TResolve>
+      ? AnyAsyncObservableMap<TKey, TResolve, TProvide>
+      : never;
 
-export type AnySyncObservableMap<TKey, TResolve> = ObservableMap<
+export type AnySyncObservableMap<
   TKey,
-  TResolve
->;
-export type AnyAsyncObservableMap<TKey, TResolve> = AsyncObservableMap<
+  TResolve,
+  TProvide extends TResolve,
+> = ObservableMap<TKey, TResolve, TProvide>;
+export type AnyAsyncObservableMap<
   TKey,
-  TResolve
->;
+  TResolve,
+  TProvide extends Promise<TResolve>,
+> = AsyncObservableMap<TKey, TResolve, TProvide>;
