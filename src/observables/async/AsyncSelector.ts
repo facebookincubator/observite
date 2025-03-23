@@ -9,7 +9,7 @@ import { Options } from '@/AbstractObservable';
 import { AbstractSelector, getStateCB } from '@/AbstractSelector';
 import { AsyncObserver } from '@/AsyncObserver';
 import { Maybe } from '@/Maybe';
-import { AsyncObservable } from './AsyncObservable';
+import { AsyncObservable } from '@/AsyncObservable';
 
 export class AsyncSelector<TResolve> extends AbstractSelector<
   TResolve,

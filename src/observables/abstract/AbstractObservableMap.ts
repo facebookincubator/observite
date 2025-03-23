@@ -43,7 +43,7 @@ import { StateRef } from '@/StateRef';
 import {
   Options as ObservableOptions,
   TAbstractObservable,
-} from './AbstractObservable';
+} from '@/AbstractObservable';
 import { Observable } from '@/Observable';
 import { AnyObserver } from '@/AnyObserver';
 

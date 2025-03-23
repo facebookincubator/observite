@@ -9,7 +9,7 @@ import { Options } from '@/AbstractObservable';
 import { AbstractSelector, getStateCB } from '@/AbstractSelector';
 import { Maybe } from '@/Maybe';
 import { SyncObserver } from '@/SyncObserver';
-import { Observable } from './Observable';
+import { Observable } from '@/Observable';
 
 export class Selector<TResolve> extends AbstractSelector<TResolve, TResolve> {
   static factory = <TResolve>(

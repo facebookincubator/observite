@@ -28,7 +28,7 @@ import {
   Options,
   ReleaseDelay,
   TAbstractObservable,
-} from './AbstractObservable';
+} from '@/AbstractObservable';
 import { StateRef } from '@/StateRef';
 import { isPromise } from '@/isPromise';
 import { AbstractObserver } from '@/AbstractObserver';

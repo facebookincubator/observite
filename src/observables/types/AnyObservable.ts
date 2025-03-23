@@ -19,6 +19,7 @@ export type AnyObservable<TResolve> =
 export type AnySyncObservable<TResolve> =
   | Observable<TResolve>
   | Selector<TResolve>;
+
 export type AnyAsyncObservable<TResolve> =
   | AsyncObservable<TResolve>
   | AsyncSelector<TResolve>;
