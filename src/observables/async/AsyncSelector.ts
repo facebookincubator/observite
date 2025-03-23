@@ -14,17 +14,17 @@ import { AsyncObservable } from '@/AsyncObservable';
 export class AsyncSelector<
   TResolve,
   TProvide extends Promise<TResolve> = Promise<TResolve>,
-> extends AbstractSelector<TResolve, TProvide> {
+> extends AbstractSelector<TResolve, TProvide, AsyncObserver> {
   static factory = <
     TResolve,
     TProvide extends Promise<TResolve> = Promise<TResolve>,
   >(
-    getState: getStateCB<TResolve, TProvide>,
+    getState: getStateCB<TResolve, TProvide, AsyncObserver>,
     options: Maybe<Options<TProvide>>
   ) => new AsyncSelector<TResolve, TProvide>(getState, options);
 
   constructor(
-    getState: getStateCB<TResolve, TProvide>,
+    getState: getStateCB<TResolve, TProvide, AsyncObserver>,
     options?: Maybe<Options<TProvide>>
   ) {
     super(getState, options, AsyncObserver.factory, AsyncObservable.factory);

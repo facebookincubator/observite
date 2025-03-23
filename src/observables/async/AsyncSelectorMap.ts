@@ -12,12 +12,13 @@ import {
 } from '@/AbstractSelectorMap';
 import { Maybe } from '@/Maybe';
 import { AsyncSelector } from '@/AsyncSelector';
+import { AsyncObserver } from '@/AsyncObserver';
 
 export class AsyncSelectorMap<
   TKey,
   TResolve,
   TProvide extends Promise<TResolve> = Promise<TResolve>,
-> extends AbstractSelectorMap<TKey, TResolve, TProvide> {
+> extends AbstractSelectorMap<TKey, TResolve, TProvide, AsyncObserver> {
   constructor(
     getState: getStateCB<TKey, TProvide>,
     options?: Maybe<Options<TKey, TProvide>>

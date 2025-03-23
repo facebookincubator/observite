@@ -55,10 +55,12 @@ export abstract class AbstractSelectorMap<
   TKey,
   TResolve,
   TProvide,
-  TSelector extends AbstractSelector<TResolve, TProvide> = AbstractSelector<
+  TObserver extends AnyObserver,
+  TSelector extends AbstractSelector<
     TResolve,
-    TProvide
-  >,
+    TProvide,
+    TObserver
+  > = AbstractSelector<TResolve, TProvide, TObserver>,
 > {
   private debugIdPrefix: Maybe<string> = null;
   private selectors: Map<TKey, TSelector> = new Map();
@@ -66,7 +68,7 @@ export abstract class AbstractSelectorMap<
   private options: Maybe<Options<TKey, TProvide>>;
 
   private createSelector: (
-    getState: getSelectorStateCB<TResolve, TProvide>,
+    getState: getSelectorStateCB<TResolve, TProvide, TObserver>,
     options: ObservableOptions<TProvide>
   ) => TSelector;
 
@@ -74,7 +76,7 @@ export abstract class AbstractSelectorMap<
     getState: getStateCB<TKey, TProvide>,
     options: Maybe<Options<TKey, TProvide>>,
     createSelector: (
-      getState: getSelectorStateCB<TResolve, TProvide>,
+      getState: getSelectorStateCB<TResolve, TProvide, TObserver>,
       options: ObservableOptions<TProvide>
     ) => TSelector
   ) {

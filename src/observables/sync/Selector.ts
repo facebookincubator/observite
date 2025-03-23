@@ -14,14 +14,14 @@ import { Observable } from '@/Observable';
 export class Selector<
   TResolve,
   TProvide extends TResolve = TResolve,
-> extends AbstractSelector<TResolve, TProvide> {
+> extends AbstractSelector<TResolve, TProvide, SyncObserver> {
   static factory = <TResolve, TProvide extends TResolve = TResolve>(
-    getState: getStateCB<TResolve, TProvide>,
+    getState: getStateCB<TResolve, TProvide, SyncObserver>,
     options: Maybe<Options<TProvide>>
   ) => new Selector<TResolve, TProvide>(getState, options);
 
   constructor(
-    getState: getStateCB<TResolve, TProvide>,
+    getState: getStateCB<TResolve, TProvide, SyncObserver>,
     options?: Maybe<Options<TProvide>>
   ) {
     super(getState, options, SyncObserver.factory, Observable.factory);

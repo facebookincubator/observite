@@ -12,12 +12,13 @@ import {
 } from '@/AbstractSelectorMap';
 import { Maybe } from '@/Maybe';
 import { Selector } from '@/Selector';
+import { SyncObserver } from '@/SyncObserver';
 
 export class SelectorMap<
   TKey,
   TResolve,
   TProvide extends TResolve = TResolve,
-> extends AbstractSelectorMap<TKey, TResolve, TProvide> {
+> extends AbstractSelectorMap<TKey, TResolve, TProvide, SyncObserver> {
   constructor(
     getState: getStateCB<TKey, TProvide>,
     options?: Maybe<Options<TKey, TProvide>>

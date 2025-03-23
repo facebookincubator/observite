@@ -34,8 +34,8 @@ import { isPromise } from '@/isPromise';
 import { AbstractObserver } from '@/AbstractObserver';
 import { AnyObserver } from '@/AnyObserver';
 
-export type getStateCB<TResolve, TProvide> = (
-  observer: AnyObserver,
+export type getStateCB<TResolve, TProvide, TObserver> = (
+  observer: TObserver,
   previous: Maybe<TResolve>
 ) => TProvide;
 
@@ -47,20 +47,21 @@ let nextDebugID = 1;
 export abstract class AbstractSelector<
   TResolve,
   TProvide,
+  TObserver extends AnyObserver,
   TObservable extends TAbstractObservable<
     TResolve,
     TProvide
   > = TAbstractObservable<TResolve, TProvide>,
 > {
   private debugID: number | string = nextDebugID++;
-  private getState: getStateCB<TResolve, TProvide>;
-  private stateObserver: AnyObserver;
+  private getState: getStateCB<TResolve, TProvide, TObserver>;
+  private stateObserver: TObserver;
   private stateObservable: TObservable;
 
   constructor(
-    getState: getStateCB<TResolve, TProvide>,
+    getState: getStateCB<TResolve, TProvide, TObserver>,
     options: Maybe<Options<TProvide>>,
-    createObserver: () => AnyObserver,
+    createObserver: () => TObserver,
     createObservable: (options: Options<TProvide>) => TObservable
   ) {
     this.getState = getState;
