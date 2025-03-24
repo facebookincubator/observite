@@ -223,7 +223,7 @@ describe('Observite Integration Tests', () => {
   //   const galaxyStore = new GalaxyStore();
   //   const starStore = new StarStore();
   //   console.log('Init...');
-  //   const starsSelector = new Selector(
+  //   const starsSelector = new Selector<Loadable<string>[]>(
   //     ({ observeKey }) => {
   //       console.log('getState');
   //       const starNames = observeKey(galaxyStore.galaxies, 'MilkyWay');
