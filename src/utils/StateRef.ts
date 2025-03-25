@@ -24,7 +24,7 @@ export enum ThrowMode {
  * Whether using async or sync state, we treat the state as if it is async.
  * Sync state simply never enters the Status.Pending status.
  */
-type AsyncState<TResolve> =
+export type AsyncState<TResolve> =
   | { status: Status.Pending; promise: Promise<TResolve> }
   | { status: Status.Resolved; result: TResolve }
   | { status: Status.Rejected; error: Error };
@@ -73,6 +73,10 @@ abstract class AbstractStateRef<TResolve, TProvide> {
 
   getStatus(): Status {
     return this.state.status;
+  }
+
+  getState(): Readonly<AsyncState<TResolve>> {
+    return this.state;
   }
 
   protected setState(state: AsyncState<TResolve>) {

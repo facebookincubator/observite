@@ -150,10 +150,10 @@ export abstract class AbstractObservableMap<
    * Should only be accessed internally
    */
   __observeRef = (
-    observer: AnyObserver,
+    observer: AbstractObserver,
     key: TKey
   ): Maybe<StateRef<TResolve, TProvide>> => {
-    const map = observer.observe(this.map);
+    const map = (observer as AnyObserver).observe(this.map);
     let observable = map.get(key);
     // If the key does not exist but a default is specified, create it.
     if (observable == null && this.getDefault != null) {

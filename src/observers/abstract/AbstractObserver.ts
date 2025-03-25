@@ -6,7 +6,11 @@
  */
 
 import { AbstractObservable } from '@/AbstractObservable';
+import { AnyObservable, AnyObservableMap } from '@/AnyObservable';
+import { AnyObserver } from '@/AnyObserver';
 import { Maybe } from '@/Maybe';
+import ObservableManager from '@/ObservableManager';
+import { AsyncState, Status } from '@/StateRef';
 
 /**
  * Static used for creating unique ids for each observable.
@@ -70,53 +74,37 @@ export abstract class AbstractObserver {
     this.observables.clear();
   }
 
-  //   observeState = <TResolve, TProvide>(
-  //     observable: ObservableOrSelector<TResolve, TProvide>
-  //   ): AsyncState<TResolve> => {
-  //     try {
-  //       return LoadObject.withValue(
-  //         observable.observeRef(this).getOrThrowSync('throwPromise')
-  //       );
-  //     } catch (e) {
-  //       if (isPromise(e)) {
-  //         e.then(
-  //           () => ObservableManager.addChangedObserver(this),
-  //           () => ObservableManager.addChangedObserver(this)
-  //         );
-  //         return LoadObject.loading();
-  //       } else {
-  //         return LoadObject.withError(e);
-  //       }
-  //     }
-  //   };
+  observeState = <TResolve, TProvide>(
+    observable: AnyObservable<TResolve, TProvide>
+  ): Readonly<AsyncState<TResolve>> => {
+    const state = observable.__observeRef(this).getState();
+    if (state.status === Status.Pending) {
+      // When the promise finishes, consider it a change event.
+      state.promise.then(
+        () => ObservableManager.addChangedObserver(this),
+        () => ObservableManager.addChangedObserver(this)
+      );
+    }
+    return state;
+  };
 
-  // observeLoadObjectKey: <TKey, TResolve, TProvide>(
-  //   ObservableOrSelectorMap<TKey, TResolve, TProvide>,
-  //   TKey,
-  // ) => LoadObject<?TResolve> = <TKey, TResolve, TProvide>(
-  //   observable: ObservableOrSelectorMap<TKey, TResolve, TProvide>,
-  //   key: TKey,
-  // ): LoadObject<?TResolve> => {
-  //   try {
-  //     return LoadObject.withValue(
-  //       observable.observeRef(this, key)?.getOrThrowSync('throwPromise'),
-  //     );
-  //   } catch (e) {
-  //     if (!isPromise(e)) {
-  //       clog.info('Caught while observing key', this.debugID, key);
-  //     }
-  //     if (isPromise(e)) {
-  //       promiseDone(
-  //         e,
-  //         () => ObservableManager.addChangedObserver(this),
-  //         () => ObservableManager.addChangedObserver(this),
-  //       );
-  //       return LoadObject.loading();
-  //     } else {
-  //       return LoadObject.withError(e);
-  //     }
-  //   }
-  // };
+  observeKeyState = <TKey, TResolve, TProvide>(
+    observable: AnyObservableMap<TKey, TResolve, TProvide>,
+    key: TKey
+  ): Maybe<Readonly<AsyncState<TResolve>>> => {
+    const state = observable.__observeRef(this, key)?.getState();
+    if (state == null) {
+      return null;
+    }
+    if (state.status === Status.Pending) {
+      // When the promise finishes, consider it a change event.
+      state.promise.then(
+        () => ObservableManager.addChangedObserver(this),
+        () => ObservableManager.addChangedObserver(this)
+      );
+    }
+    return state;
+  };
 
   /**
    * Should only be called by internal systems.
