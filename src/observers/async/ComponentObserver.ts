@@ -18,7 +18,7 @@ import ObservableManager from '@/ObservableManager';
 import { ThrowMode } from '@/StateRef';
 
 export class ComponentObserver extends AbstractObserver {
-  #isLocked: boolean = false;
+  private isLocked: boolean = false;
   static factory: () => ComponentObserver = () => new ComponentObserver();
 
   observe = <TResolve, TProvide>(
@@ -35,11 +35,11 @@ export class ComponentObserver extends AbstractObserver {
   };
 
   lock() {
-    this.#isLocked = true;
+    this.isLocked = true;
   }
 
   unlock() {
-    this.#isLocked = false;
+    this.isLocked = false;
   }
 
   onRender() {
@@ -47,7 +47,7 @@ export class ComponentObserver extends AbstractObserver {
   }
 
   __addObservable(observable: AbstractObservable): void {
-    if (this.#isLocked === true) {
+    if (this.isLocked === true) {
       throw new Error('Using ComponentObserver outside of render function');
     }
     super.__addObservable(observable);

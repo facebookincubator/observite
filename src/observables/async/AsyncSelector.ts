@@ -16,12 +16,12 @@ export class AsyncSelector<
   TProvide extends Promise<TResolve> = Promise<TResolve>,
 > extends AbstractSelector<TResolve, TProvide, AsyncObserver> {
   static factory = <
-    TResolve,
-    TProvide extends Promise<TResolve> = Promise<TResolve>,
+    TResolveF,
+    TProvideF extends Promise<TResolveF> = Promise<TResolveF>,
   >(
-    getState: getStateCB<TResolve, TProvide, AsyncObserver>,
-    options: Maybe<Options<TProvide>>
-  ) => new AsyncSelector<TResolve, TProvide>(getState, options);
+    getState: getStateCB<TResolveF, TProvideF, AsyncObserver>,
+    options: Maybe<Options<TProvideF>>
+  ) => new AsyncSelector<TResolveF, TProvideF>(getState, options);
 
   constructor(
     getState: getStateCB<TResolve, TProvide, AsyncObserver>,

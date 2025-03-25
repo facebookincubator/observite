@@ -13,9 +13,9 @@ export class AsyncObservable<
   TProvide extends Promise<TResolve> = Promise<TResolve>,
 > extends TAbstractObservable<TResolve, TProvide> {
   static factory = <
-    TResolve,
-    TProvide extends Promise<TResolve> = Promise<TResolve>,
+    TResolveF,
+    TProvideF extends Promise<TResolveF> = Promise<TResolveF>,
   >(
-    options?: Maybe<Options<TProvide>>
-  ) => new AsyncObservable<TResolve, TProvide>(options);
+    options?: Maybe<Options<TProvideF>>
+  ) => new AsyncObservable<TResolveF, TProvideF>(options);
 }

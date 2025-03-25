@@ -15,10 +15,10 @@ export class Selector<
   TResolve,
   TProvide extends TResolve = TResolve,
 > extends AbstractSelector<TResolve, TProvide, SyncObserver> {
-  static factory = <TResolve, TProvide extends TResolve = TResolve>(
-    getState: getStateCB<TResolve, TProvide, SyncObserver>,
-    options: Maybe<Options<TProvide>>
-  ) => new Selector<TResolve, TProvide>(getState, options);
+  static factory = <TResolveF, TProvideF extends TResolveF = TResolveF>(
+    getState: getStateCB<TResolveF, TProvideF, SyncObserver>,
+    options: Maybe<Options<TProvideF>>
+  ) => new Selector<TResolveF, TProvideF>(getState, options);
 
   constructor(
     getState: getStateCB<TResolve, TProvide, SyncObserver>,

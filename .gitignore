@@ -2,3 +2,4 @@
 node_modules/
 # generated output
 dist
+flow-types

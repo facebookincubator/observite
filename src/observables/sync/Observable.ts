@@ -12,7 +12,7 @@ export class Observable<
   TResolve,
   TProvide extends TResolve = TResolve,
 > extends TAbstractObservable<TResolve, TProvide> {
-  static factory = <TResolve, TProvide extends TResolve = TResolve>(
-    options?: Maybe<Options<TProvide>>
-  ) => new Observable<TResolve, TProvide>(options);
+  static factory = <TResolveF, TProvideF extends TResolveF = TResolveF>(
+    options?: Maybe<Options<TProvideF>>
+  ) => new Observable<TResolveF, TProvideF>(options);
 }
