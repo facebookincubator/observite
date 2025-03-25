@@ -5,13 +5,15 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+import { getConfig } from '@/config';
+
 /**
  * Optional base class for classes containing observables.
  * Injects debug IDs into the observables for logging.
  */
 export default class ObservableStore {
   constructor() {
-    setImmediate(() => {
+    getConfig().setImmediate(() => {
       const className = this.constructor.name;
       for (const propName in this) {
         const prop: unknown = this[propName];

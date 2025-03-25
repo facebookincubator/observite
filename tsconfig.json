@@ -33,16 +33,17 @@
     /* Specify a set of entries that re-map imports to additional lookup locations. */
     "paths": {
       "@/*": [
-        "src/utils/*",
-        "src/observers/abstract/*",
-        "src/observers/async/*",
-        "src/observers/sync/*",
-        "src/observers/types/*",
+        "src/config/*",
+        "src/manager/*",
         "src/observables/abstract/*",
         "src/observables/async/*",
         "src/observables/sync/*",
         "src/observables/types/*",
-        "src/manager/*"
+        "src/observers/abstract/*",
+        "src/observers/async/*",
+        "src/observers/sync/*",
+        "src/observers/types/*",
+        "src/utils/*"
       ]
     },
     // "rootDirs": [],                                   /* Allow multiple folders to be treated as one when resolving modules. */

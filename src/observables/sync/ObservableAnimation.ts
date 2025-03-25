@@ -10,6 +10,7 @@ import { Options as ObservableOptions } from '@/AbstractObservable';
 import { Observable } from '@/Observable';
 import { nullthrows } from '@/nullthrows';
 import { areEqual, ComparisonMethod } from '@/areEqual';
+import { getConfig } from '@/config';
 
 type Options<T> = {
   // How long does it take to go from current to target
@@ -98,9 +99,9 @@ export class ObservableAnimation<T> {
       const tStep = delayMs / transitionDurationMs;
       let id;
       if (waitMs > 0) {
-        id = setInterval(this.startInterval, waitMs);
+        id = getConfig().setInterval(this.startInterval, waitMs);
       } else {
-        id = setInterval(this.onFrame, delayMs);
+        id = getConfig().setInterval(this.onFrame, delayMs);
       }
       this.animationState = { start, end, t: 0, tStep, id, delayMs };
     }
@@ -108,8 +109,11 @@ export class ObservableAnimation<T> {
 
   private startInterval = () => {
     const animationState = nullthrows(this.animationState);
-    clearInterval(animationState.id);
-    animationState.id = setInterval(this.onFrame, animationState.delayMs);
+    getConfig().clearInterval(animationState.id);
+    animationState.id = getConfig().setInterval(
+      this.onFrame,
+      animationState.delayMs
+    );
   };
 
   private onFrame = () => {
@@ -130,7 +134,7 @@ export class ObservableAnimation<T> {
   clearAnimation(): void {
     if (this.animationState) {
       const { id } = this.animationState;
-      id && clearInterval(id);
+      id && getConfig().clearInterval(id);
       this.animationState = null;
     }
   }

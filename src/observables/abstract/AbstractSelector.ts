@@ -33,6 +33,7 @@ import { StateRef } from '@/StateRef';
 import { isPromise } from '@/isPromise';
 import { AbstractObserver } from '@/AbstractObserver';
 import { AnyObserver } from '@/AnyObserver';
+import { getConfig } from '@/config';
 
 export type getStateCB<TResolve, TProvide, TObserver> = (
   observer: TObserver,
@@ -68,9 +69,7 @@ export abstract class AbstractSelector<
     this.stateObserver = createObserver();
     this.stateObserver.setOnChange(this.updateState);
     this.stateObservable = createObservable({
-      // By default, we want selectors to release their state when not
-      // observed, as this data is derived and doesn't need to persist.
-      releaseDelay: ReleaseDelay.Default,
+      releaseDelay: getConfig().defaultSelectorReleaseDelay,
       ...options,
       // Wrap the onRelease function to ensure that anything this
       // selector is observing stops being observed.

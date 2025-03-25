@@ -48,12 +48,17 @@ import {
 } from '@/StateRef';
 import ObservableManager from '@/ObservableManager';
 import { Maybe } from '@/Maybe';
+import { getConfig } from '@/config';
 
 type TimeoutID = ReturnType<typeof setTimeout>;
 
+/**
+ * Since ReleaseDelay is a union type that includes a number for exact release
+ * delays, we need to use a string literal to ensure type safety.
+ */
 export enum ReleaseDelay {
-  Default,
-  Never,
+  Default = 'Default',
+  Never = 'Never',
 }
 
 /**
@@ -91,12 +96,6 @@ export type Options<TProvide> = Partial<{
  * Used to generate unique IDs for each observable instance.
  */
 let nextDebugID = 1;
-
-/**
- * The default duration (in milliseconds) to wait before releasing observables
- * that are no longer being observed by any subscribers.
- */
-const DEFAULT_RELEASE_DELAY_MS = 1;
 
 /**
  * AbstractObservable serves as a base class for managing references to
@@ -193,7 +192,7 @@ export abstract class TAbstractObservable<
       areEqual(
         value,
         currentValue,
-        this.options?.comparisonMethod ?? ComparisonMethod.ShallowEqual
+        this.options?.comparisonMethod ?? getConfig().defaultComparisonMethod
       )
     ) {
       return;
@@ -260,7 +259,8 @@ export abstract class TAbstractObservable<
    */
   __checkForNoObservers() {
     const ref = this.stateRef;
-    const releaseDelay = this.options?.releaseDelay;
+    const releaseDelay =
+      this.options?.releaseDelay ?? getConfig().defaultObservableReleaseDelay;
     if (
       // Ensure the state has not already been cleaned up
       ref != null &&
@@ -274,10 +274,10 @@ export abstract class TAbstractObservable<
     ) {
       // Schedule the release with a delay to avoid unnecessary state disposal
       // if something quickly re-subscribes.
-      this.releaseTimeoutID = setTimeout(
+      this.releaseTimeoutID = getConfig().setTimeout(
         () => this.release(ref),
         releaseDelay === ReleaseDelay.Default
-          ? DEFAULT_RELEASE_DELAY_MS
+          ? getConfig().defaultReleaseDelayMS
           : releaseDelay
       );
     }
@@ -314,7 +314,8 @@ export abstract class TAbstractObservable<
    * Cancels any pending release timeout if it exists.
    */
   private resetReleaseTimeout() {
-    this.releaseTimeoutID != null && clearTimeout(this.releaseTimeoutID);
+    this.releaseTimeoutID != null &&
+      getConfig().clearTimeout(this.releaseTimeoutID);
     this.releaseTimeoutID = null;
   }
 
