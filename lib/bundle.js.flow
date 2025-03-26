@@ -1,0 +1,788 @@
+/**
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ * @flow strict-local
+ */
+
+
+
+import { AsyncObservable } from "./observables/async/AsyncObservable";
+import { AsyncObservableMap } from "./observables/async/AsyncObservableMap";
+import { AsyncObserver } from "./observers/async/AsyncObserver";
+import { AsyncSelector } from "./observables/async/AsyncSelector";
+import { AsyncSelectorMap } from "./observables/async/AsyncSelectorMap";
+import { setConfigOptions } from "./config/config";
+import { Observable } from "./observables/sync/Observable";
+import { ObservableAnimation } from "./observables/sync/ObservableAnimation";
+import { ObservableMap } from "./observables/sync/ObservableMap";
+import ObservableStore from "./utils/ObservableStore";
+import { Selector } from "./observables/sync/Selector";
+import { SelectorMap } from "./observables/sync/SelectorMap";
+declare var _default: {
+  AsyncObservable: typeof AsyncObservable,
+  AsyncObservableMap: typeof AsyncObservableMap,
+  AsyncObserver: typeof AsyncObserver,
+  AsyncSelector: typeof AsyncSelector,
+  AsyncSelectorMap: typeof AsyncSelectorMap,
+  Observable: typeof Observable,
+  ObservableAnimation: typeof ObservableAnimation,
+  ObservableMap: typeof ObservableMap,
+  ObservableStore: typeof ObservableStore,
+  Selector: typeof Selector,
+  SelectorMap: typeof SelectorMap,
+  setConfigOptions: typeof setConfigOptions,
+  ...
+};
+declare export default typeof _default;
+
+
+import { ReleaseDelay } from "../observables/abstract/AbstractObservable";
+import { ComparisonMethod } from "../utils/areEqual";
+
+
+export type Config = {
+  defaultComparisonMethod: $Values<typeof ComparisonMethod>,
+  defaultReleaseDelayMS: number,
+  defaultObservableReleaseDelay: $Values<typeof ReleaseDelay> | number,
+  defaultSelectorReleaseDelay: $Values<typeof ReleaseDelay> | number,
+  setTimeout: typeof setTimeout,
+  clearTimeout: typeof clearTimeout,
+  setInterval: typeof setInterval,
+  clearInterval: typeof clearInterval,
+  setImmediate: typeof setImmediate,
+  ...
+};
+declare export function setConfigOptions(options: $Rest<Config, { ... }>): void;
+declare export function getConfig(): $ReadOnly<Config>;
+
+
+import { AbstractObservable } from "../observables/abstract/AbstractObservable";
+import { AbstractObserver } from "../observers/abstract/AbstractObserver";
+declare class ObservableManager {
+  
+  addChangedObservers(
+    observable: AbstractObservable,
+    observers: Set<AbstractObserver>
+  ): void;
+
+  
+  addChangedObserver(observer: AbstractObserver): void;
+
+  
+  deferredCheckForNoObservers(observable: AbstractObservable): void;
+
+  
+  changeHandled(observer: AbstractObserver): void;
+}
+declare var manager: ObservableManager;
+declare export default typeof manager;
+
+
+import { ComparisonMethod } from "../../utils/areEqual";
+import { AbstractObserver } from "../../observers/abstract/AbstractObserver";
+import { StateRef } from "../../utils/StateRef";
+import { Maybe } from "../../utils/Maybe";
+
+
+
+declare export var ReleaseDelay: {|
+  +Default: "Default", // "Default"
+  +Never: "Never", // "Never"
+|};
+
+
+export type Options<TProvide> = $Rest<
+  {
+    default: TProvide,
+    debugID: string,
+    onChanged: (newValue: TProvide) => mixed,
+    releaseDelay: number | $Values<typeof ReleaseDelay>,
+    onRelease: (provided: TProvide) => mixed,
+    comparisonMethod: $Values<typeof ComparisonMethod>,
+    ...
+  },
+  { ... }
+>;
+
+declare export class AbstractObservable {
+  debugID: number | string;
+  __checkForNoObservers(): void;
+  __removeObserver(observer: AbstractObserver): void;
+  setDebugPrefix: (prefix: number | string) => void;
+}
+
+declare export class TAbstractObservable<TResolve, TProvide>
+  mixins AbstractObservable
+{
+  constructor(options?: Maybe<Options<TProvide>>): this;
+
+  
+  isInitialized(): boolean;
+
+  
+  destroy(): void;
+
+  
+  peek: () => Maybe<TResolve>;
+
+  
+  set: (value: TProvide) => void;
+
+  
+  setImpl(value: TProvide): void;
+
+  
+  setError(error: Error): void;
+
+  
+  __observeRef: (observer: AbstractObserver) => StateRef<TResolve, TProvide>;
+
+  
+  __removeObserver(observer: AbstractObserver): void;
+
+  
+  __checkForNoObservers(): void;
+}
+
+
+import { AbstractObserver } from "../../observers/abstract/AbstractObserver";
+import { Maybe } from "../../utils/Maybe";
+import { StateRef } from "../../utils/StateRef";
+import {
+  Options as ObservableOptions,
+  TAbstractObservable,
+} from "./AbstractObservable";
+
+
+export type getDefaultCB<TKey, TProvide> = (key: TKey) => TProvide;
+
+export type Options<TKey, TProvide> = {
+  ...$Diff<ObservableOptions<TProvide>, { onRelease: any }>,
+  ...$Rest<
+    {
+      onRelease: (key: TKey, provide: TProvide) => void,
+      ...
+    },
+    { ... }
+  >,
+};
+declare export class AbstractObservableMap<
+  TKey,
+  TResolve,
+  TProvide,
+  TObservable: TAbstractObservable<TResolve, TProvide> = TAbstractObservable<
+    TResolve,
+    TProvide
+  >
+> {
+  constructor(
+    getDefault: Maybe<getDefaultCB<TKey, TProvide>>,
+    valueOptions: Maybe<Options<TKey, TProvide>>,
+    makeObservable: (options: ObservableOptions<TProvide>) => TObservable
+  ): this;
+  setDebugPrefix: (prefix: string) => void;
+
+  
+  peek: (key: TKey) => Maybe<TResolve>;
+  peekEntries: () => Maybe<Array<[TKey, Maybe<TResolve>]>>;
+
+  
+  set: (key: TKey, value: TProvide) => void;
+  has(key: TKey): boolean;
+
+  
+  clear(): void;
+
+  
+  __observeRef: (
+    observer: AbstractObserver,
+    key: TKey
+  ) => Maybe<StateRef<TResolve, TProvide>>;
+}
+
+
+import { Maybe } from "../../utils/Maybe";
+import { Options, TAbstractObservable } from "./AbstractObservable";
+import { StateRef } from "../../utils/StateRef";
+import { AbstractObserver } from "../../observers/abstract/AbstractObserver";
+import { AnyObserver } from "../../observers/types/AnyObserver";
+export type getStateCB<TResolve, TProvide, TObserver> = (
+  observer: TObserver,
+  previous: Maybe<TResolve>
+) => TProvide;
+declare export class AbstractSelector<
+  TResolve,
+  TProvide,
+  TObserver: AnyObserver,
+  TObservable: TAbstractObservable<TResolve, TProvide> = TAbstractObservable<
+    TResolve,
+    TProvide
+  >
+> {
+  constructor(
+    getState: getStateCB<TResolve, TProvide, TObserver>,
+    options: Maybe<Options<TProvide>>,
+    createObserver: () => TObserver,
+    createObservable: (options: Options<TProvide>) => TObservable
+  ): this;
+  setDebugPrefix: (prefix: string) => void;
+
+  
+  destroy(): void;
+
+  
+  peek: () => Maybe<TResolve>;
+  peekSafe: () => Maybe<TResolve>;
+
+  
+  set: (_: TProvide) => empty;
+
+  
+  __observeRef: (observer: AbstractObserver) => StateRef<TResolve, TProvide>;
+}
+
+
+import { AbstractObserver } from "../../observers/abstract/AbstractObserver";
+import { Options as ObservableOptions } from "./AbstractObservable";
+import {
+  AbstractSelector,
+  getStateCB as getSelectorStateCB,
+} from "./AbstractSelector";
+import { Maybe } from "../../utils/Maybe";
+import { StateRef } from "../../utils/StateRef";
+import { AnyObserver } from "../../observers/types/AnyObserver";
+
+
+export type getStateCB<TKey, TProvide> = (
+  Observer: AnyObserver,
+  TKey: TKey
+) => TProvide;
+
+export type Options<TKey, TProvide> = {
+  ...$Diff<ObservableOptions<TProvide>, { onRelease: any }>,
+  ...$Rest<
+    {
+      onRelease: (key: TKey, provide: TProvide) => void,
+      ...
+    },
+    { ... }
+  >,
+};
+declare export class AbstractSelectorMap<
+  TKey,
+  TResolve,
+  TProvide,
+  TObserver: AnyObserver,
+  TSelector: AbstractSelector<TResolve, TProvide, TObserver> = AbstractSelector<
+    TResolve,
+    TProvide,
+    TObserver
+  >
+> {
+  constructor(
+    getState: getStateCB<TKey, TProvide>,
+    options: Maybe<Options<TKey, TProvide>>,
+    createSelector: (
+      getState: getSelectorStateCB<TResolve, TProvide, TObserver>,
+      options: ObservableOptions<TProvide>
+    ) => TSelector
+  ): this;
+  setDebugPrefix: (prefix: string) => void;
+
+  
+  peek: (key: TKey) => Maybe<TResolve>;
+
+  
+  set: (_key: TKey, _provide: TProvide) => empty;
+
+  
+  __observeRef: (
+    observer: AbstractObserver,
+    key: TKey
+  ) => StateRef<TResolve, TProvide>;
+}
+
+
+import { Maybe } from "../../utils/Maybe";
+import { Options, TAbstractObservable } from "../abstract/AbstractObservable";
+declare export class AsyncObservable<
+    TResolve,
+    TProvide: Promise<TResolve> = Promise<TResolve>
+  >
+  mixins TAbstractObservable<TResolve, TProvide>
+{
+  static factory: <TResolveF, TProvideF: Promise<TResolveF>>(
+    options?: Maybe<Options<TProvideF>>
+  ) => AsyncObservable<TResolveF, TProvideF>;
+}
+
+
+import { Maybe } from "../../utils/Maybe";
+import {
+  AbstractObservableMap,
+  getDefaultCB,
+  Options,
+} from "../abstract/AbstractObservableMap";
+declare export class AsyncObservableMap<
+    TKey,
+    TResolve,
+    TProvide: Promise<TResolve> = Promise<TResolve>
+  >
+  mixins AbstractObservableMap<TKey, TResolve, TProvide>
+{
+  constructor(
+    getDefault?: Maybe<getDefaultCB<TKey, TProvide>>,
+    valueOptions?: Maybe<Options<TKey, TProvide>>
+  ): this;
+}
+
+
+import { Options } from "../abstract/AbstractObservable";
+import { AbstractSelector, getStateCB } from "../abstract/AbstractSelector";
+import { AsyncObserver } from "../../observers/async/AsyncObserver";
+import { Maybe } from "../../utils/Maybe";
+declare export class AsyncSelector<
+    TResolve,
+    TProvide: Promise<TResolve> = Promise<TResolve>
+  >
+  mixins AbstractSelector<TResolve, TProvide, AsyncObserver>
+{
+  static factory: <TResolveF, TProvideF: Promise<TResolveF>>(
+    getState: getStateCB<TResolveF, TProvideF, AsyncObserver>,
+    options: Maybe<Options<TProvideF>>
+  ) => AsyncSelector<TResolveF, TProvideF>;
+  constructor(
+    getState: getStateCB<TResolve, TProvide, AsyncObserver>,
+    options?: Maybe<Options<TProvide>>
+  ): this;
+}
+
+
+import {
+  AbstractSelectorMap,
+  getStateCB,
+  Options,
+} from "../abstract/AbstractSelectorMap";
+import { Maybe } from "../../utils/Maybe";
+import { AsyncObserver } from "../../observers/async/AsyncObserver";
+declare export class AsyncSelectorMap<
+    TKey,
+    TResolve,
+    TProvide: Promise<TResolve> = Promise<TResolve>
+  >
+  mixins AbstractSelectorMap<TKey, TResolve, TProvide, AsyncObserver>
+{
+  constructor(
+    getState: getStateCB<TKey, TProvide>,
+    options?: Maybe<Options<TKey, TProvide>>
+  ): this;
+}
+
+
+import { Maybe } from "../../utils/Maybe";
+import { Options, TAbstractObservable } from "../abstract/AbstractObservable";
+declare export class Observable<TResolve, TProvide: TResolve = TResolve>
+  mixins TAbstractObservable<TResolve, TProvide>
+{
+  static factory: <TResolveF, TProvideF: TResolveF>(
+    options?: Maybe<Options<TProvideF>>
+  ) => Observable<TResolveF, TProvideF>;
+}
+
+
+import { Maybe } from "../../utils/Maybe";
+import { Options as ObservableOptions } from "../abstract/AbstractObservable";
+import { Observable } from "./Observable";
+declare type Options<T> = {
+  transitionDurationMs: number,
+  framesPerSecond: number,
+  waitMs: number,
+  interpolateCB?: <T>(start: T, end: T, t: number) => T,
+  ...
+};
+declare export class ObservableAnimation<T> {
+  target: Observable<T>;
+  current: Observable<T>;
+  animationState: Maybe<{
+    start: T,
+    end: T,
+    t: number,
+    tStep: number,
+    delayMs: number,
+    id: $Call<<R>((...args: any[]) => R) => R, typeof setInterval>,
+    ...
+  }>;
+  constructor(
+    targetOptions?: Maybe<ObservableOptions<T>>,
+    currentOptions?: Maybe<ObservableOptions<T>>,
+    options?: Maybe<$Rest<Options<T>, { ... }>>
+  ): this;
+  setTarget(value: T): void;
+  setCurrent(value: T): void;
+  setBoth(value: T): void;
+  destroy(): void;
+  clearAnimation(): void;
+}
+
+
+import { Maybe } from "../../utils/Maybe";
+import {
+  AbstractObservableMap,
+  getDefaultCB,
+  Options,
+} from "../abstract/AbstractObservableMap";
+declare export class ObservableMap<
+    TKey,
+    TResolve,
+    TProvide: TResolve = TResolve
+  >
+  mixins AbstractObservableMap<TKey, TResolve, TProvide>
+{
+  constructor(
+    getDefault?: Maybe<getDefaultCB<TKey, TProvide>>,
+    valueOptions?: Maybe<Options<TKey, TProvide>>
+  ): this;
+}
+
+
+import { Options } from "../abstract/AbstractObservable";
+import { AbstractSelector, getStateCB } from "../abstract/AbstractSelector";
+import { Maybe } from "../../utils/Maybe";
+import { SyncObserver } from "../../observers/sync/SyncObserver";
+declare export class Selector<TResolve, TProvide: TResolve = TResolve>
+  mixins AbstractSelector<TResolve, TProvide, SyncObserver>
+{
+  static factory: <TResolveF, TProvideF: TResolveF>(
+    getState: getStateCB<TResolveF, TProvideF, SyncObserver>,
+    options: Maybe<Options<TProvideF>>
+  ) => Selector<TResolveF, TProvideF>;
+  constructor(
+    getState: getStateCB<TResolve, TProvide, SyncObserver>,
+    options?: Maybe<Options<TProvide>>
+  ): this;
+}
+
+
+import {
+  AbstractSelectorMap,
+  getStateCB,
+  Options,
+} from "../abstract/AbstractSelectorMap";
+import { Maybe } from "../../utils/Maybe";
+import { SyncObserver } from "../../observers/sync/SyncObserver";
+declare export class SelectorMap<TKey, TResolve, TProvide: TResolve = TResolve>
+  mixins AbstractSelectorMap<TKey, TResolve, TProvide, SyncObserver>
+{
+  constructor(
+    getState: getStateCB<TKey, TProvide>,
+    options?: Maybe<Options<TKey, TProvide>>
+  ): this;
+}
+
+type $FlowGen$If<X: boolean, Then, Else = empty> = $Call<
+  ((true, Then, Else) => Then) & ((false, Then, Else) => Else),
+  X,
+  Then,
+  Else
+>;
+
+type $FlowGen$Assignable<A, B> = $Call<
+  ((...r: [B]) => true) & ((...r: [A]) => false),
+  A
+>;
+
+import { AsyncObservable } from "../async/AsyncObservable";
+import { AsyncObservableMap } from "../async/AsyncObservableMap";
+import { AsyncSelector } from "../async/AsyncSelector";
+import { AsyncSelectorMap } from "../async/AsyncSelectorMap";
+import { Observable } from "../sync/Observable";
+import { ObservableMap } from "../sync/ObservableMap";
+import { Selector } from "../sync/Selector";
+import { SelectorMap } from "../sync/SelectorMap";
+export type AnyObservable<TResolve, TProvide> = $FlowGen$If<
+  $FlowGen$Assignable<[TProvide], [TResolve]>,
+  AnySyncObservable<TResolve, TProvide>,
+  $FlowGen$If<
+    $FlowGen$Assignable<[TProvide], [Promise<TResolve>]>,
+    AnyAsyncObservable<TResolve, TProvide>,
+    empty
+  >
+>;
+export type AnySyncObservable<TResolve, TProvide: TResolve> =
+  | Observable<TResolve, TProvide>
+  | Selector<TResolve, TProvide>;
+export type AnyAsyncObservable<TResolve, TProvide: Promise<TResolve>> =
+  | AsyncObservable<TResolve, TProvide>
+  | AsyncSelector<TResolve, TProvide>;
+export type AnyObservableMap<TKey, TResolve, TProvide> = $FlowGen$If<
+  $FlowGen$Assignable<[TProvide], [TResolve]>,
+  AnySyncObservableMap<TKey, TResolve, TProvide>,
+  $FlowGen$If<
+    $FlowGen$Assignable<[TProvide], [Promise<TResolve>]>,
+    AnyAsyncObservableMap<TKey, TResolve, TProvide>,
+    empty
+  >
+>;
+export type AnySyncObservableMap<TKey, TResolve, TProvide: TResolve> =
+  | ObservableMap<TKey, TResolve, TProvide>
+  | SelectorMap<TKey, TResolve, TProvide>;
+export type AnyAsyncObservableMap<
+  TKey,
+  TResolve,
+  TProvide: Promise<TResolve>
+> =
+  | AsyncObservableMap<TKey, TResolve, TProvide>
+  | AsyncSelectorMap<TKey, TResolve, TProvide>;
+
+
+import { AbstractObservable } from "../../observables/abstract/AbstractObservable";
+import {
+  AnyObservable,
+  AnyObservableMap,
+} from "../../observables/types/AnyObservable";
+import { Maybe } from "../../utils/Maybe";
+import { AsyncState } from "../../utils/StateRef";
+
+
+declare export class AbstractObserver {
+  debugID: number | string;
+  isComponent: boolean;
+  constructor(debugPrefix?: Maybe<string>): this;
+
+  
+  __getCreationOrder(): number;
+  setDebugPrefix(prefix: number | string): void;
+  setOnChange(onChange: () => void): void;
+  getIsComponent(): boolean;
+
+  
+  destroy(): void;
+
+  
+  reset(): void;
+  observeState: <TResolve, TProvide>(
+    observable: AnyObservable<TResolve, TProvide>
+  ) => $ReadOnly<AsyncState<TResolve>>;
+  observeKeyState: <TKey, TResolve, TProvide>(
+    observable: AnyObservableMap<TKey, TResolve, TProvide>,
+    key: TKey
+  ) => Maybe<$ReadOnly<AsyncState<TResolve>>>;
+
+  
+  __addObservable(observable: AbstractObservable): void;
+
+  
+  __observableChanged(): void;
+}
+
+
+import { AbstractObserver } from "../abstract/AbstractObserver";
+import {
+  AnyObservable,
+  AnyObservableMap,
+} from "../../observables/types/AnyObservable";
+import { Maybe } from "../../utils/Maybe";
+declare export class AsyncObserver mixins AbstractObserver {
+  static factory: () => AsyncObserver;
+  observe: <TResolve, TProvide>(
+    observable: AnyObservable<TResolve, TProvide>
+  ) => TResolve | TProvide;
+  observeKey: <TKey, TResolve, TProvide>(
+    observable: AnyObservableMap<TKey, TResolve, TProvide>,
+    key: TKey
+  ) => Maybe<TResolve | TProvide>;
+}
+
+
+import { AbstractObservable } from "../../observables/abstract/AbstractObservable";
+import { AbstractObserver } from "../abstract/AbstractObserver";
+import {
+  AnyObservable,
+  AnyObservableMap,
+} from "../../observables/types/AnyObservable";
+import { Maybe } from "../../utils/Maybe";
+declare export class ComponentObserver mixins AbstractObserver {
+  static factory: () => ComponentObserver;
+  observe: <TResolve, TProvide>(
+    observable: AnyObservable<TResolve, TProvide>
+  ) => TResolve;
+  observeKey: <TKey, TResolve, TProvide>(
+    observable: AnyObservableMap<TKey, TResolve, TProvide>,
+    key: TKey
+  ) => Maybe<TResolve>;
+  lock(): void;
+  unlock(): void;
+  onRender(): void;
+  __addObservable(observable: AbstractObservable): void;
+}
+
+
+import { Maybe } from "../../utils/Maybe";
+import { AbstractObserver } from "../abstract/AbstractObserver";
+import {
+  AnyObservable,
+  AnyObservableMap,
+} from "../../observables/types/AnyObservable";
+declare export class SyncObserver mixins AbstractObserver {
+  static factory: () => SyncObserver;
+  observe: <TResolve, TProvide>(
+    observable: AnyObservable<TResolve, TProvide>
+  ) => TResolve;
+  observeKey: <TKey, TResolve, TProvide>(
+    observable: AnyObservableMap<TKey, TResolve, TProvide>,
+    key: TKey
+  ) => Maybe<TResolve>;
+}
+
+
+import { AsyncObserver } from "../async/AsyncObserver";
+import { SyncObserver } from "../sync/SyncObserver";
+export type AnyObserver = AsyncObserver | SyncObserver;
+
+
+
+
+declare export var ComparisonMethod: {|
+  +Exact: 0, // 0
+  +ShallowEqual: 1, // 1
+  +DeepEquals: 2, // 2
+|};
+
+
+declare export function areEqual(
+  a: mixed,
+  b: mixed,
+  method: $Values<typeof ComparisonMethod>
+): boolean;
+
+
+
+declare export function isPromise<T>(value: mixed): boolean;
+
+
+
+export type Maybe<T> = T | null | void;
+
+
+import { Maybe } from "./Maybe";
+declare export function nullthrows<T>(value: Maybe<T>, message?: string): T;
+
+
+
+
+declare export default class ObservableStore {
+  constructor(): this;
+}
+
+type $FlowGen$If<X: boolean, Then, Else = empty> = $Call<
+  ((true, Then, Else) => Then) & ((false, Then, Else) => Else),
+  X,
+  Then,
+  Else
+>;
+
+type $FlowGen$Assignable<A, B> = $Call<
+  ((...r: [B]) => true) & ((...r: [A]) => false),
+  A
+>;
+
+import { Maybe } from "./Maybe";
+
+declare export var Status: {|
+  +Pending: 0, // 0
+  +Resolved: 1, // 1
+  +Rejected: 2, // 2
+|};
+
+declare export var ThrowMode: {|
+  +ErrorOnPending: 0, // 0
+  +ThrowPromise: 1, // 1
+|};
+
+
+export type AsyncState<TResolve> =
+  | {
+      status: typeof Status.Pending,
+      promise: Promise<TResolve>,
+      ...
+    }
+  | {
+      status: typeof Status.Resolved,
+      result: TResolve,
+      ...
+    }
+  | {
+      status: typeof Status.Rejected,
+      error: Error,
+      ...
+    };
+declare type StatusChangeCB = (
+  next: $Values<typeof Status>,
+  prev: $Values<typeof Status>
+) => mixed;
+
+declare type HolderForProvided<TProvide> = {
+  provided: TProvide,
+  ...
+};
+
+declare class AbstractStateRef<TResolve, TProvide> {
+  constructor(
+    holder: Maybe<HolderForProvided<TProvide>>,
+    state: AsyncState<TResolve>,
+    onStatusChanged?: Maybe<StatusChangeCB>
+  ): this;
+  getStatus(): $Values<typeof Status>;
+  getState(): $ReadOnly<AsyncState<TResolve>>;
+  setState(state: AsyncState<TResolve>): void;
+  getHolderForProvided(): Maybe<HolderForProvided<TProvide>>;
+
+  
+  peek(): Maybe<TResolve>;
+
+  
+  getOrThrowProvided(): TProvide;
+
+  
+  getOrThrowAsync(): TProvide | TResolve;
+
+  
+  getOrThrowSync(mode: $Values<typeof ThrowMode>): TResolve;
+}
+declare class AsyncStateRef<TResolve, TProvide: Promise<TResolve>>
+  mixins AbstractStateRef<TResolve, TProvide>
+{
+  promise: Promise<TResolve>;
+  constructor(promise: TProvide, onStatusChanged?: Maybe<StatusChangeCB>): this;
+}
+declare class SyncStateRef<TResolve, TProvide>
+  mixins AbstractStateRef<TResolve, TProvide>
+{
+  constructor(
+    result: { ...TProvide, ...TResolve },
+    onStatusChanged?: Maybe<StatusChangeCB>
+  ): this;
+}
+export type StateRef<TResolve, TProvide> = $FlowGen$If<
+  $FlowGen$Assignable<TProvide, Promise<TResolve>>,
+  AsyncStateRef<TResolve, TProvide>,
+  SyncStateRef<TResolve, TProvide>
+>;
+
+declare export function stateRefFromProvided<TResolve, TProvide>(
+  provided: TProvide,
+  onStatusChanged?: Maybe<StatusChangeCB>
+): StateRef<TResolve, TProvide>;
+
+
+declare export function stateRefFromError<TResolve, TProvide>(
+  error: Error
+): StateRef<TResolve, TProvide>;
+
+
+
+
+
