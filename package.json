@@ -7,7 +7,8 @@
     "build": "tsc && tsc-alias",
     "build:flow:windows": "tsc && tsc-alias && npm run flowgen:windows && npm run bundle:flow",
     "flowgen:windows": "node -e \"const { execSync } = require('child_process'); const { readdirSync, statSync, mkdirSync } = require('fs'); const { join, dirname } = require('path'); function walk(dir) { const results = []; for (const file of readdirSync(dir)) { const full = join(dir, file); if (statSync(full).isDirectory()) results.push(...walk(full)); else if (full.endsWith('.d.ts')) results.push(full); } return results; } walk('dist').forEach(file => { const out = join('flow-types', file.replace(/^dist[\\/]/, '').replace(/\\.d\\.ts$/, '.js.flow')); mkdirSync(dirname(out), { recursive: true }); try { execSync(`npx flowgen \"${file}\" -o \"${out}\"`, { stdio: 'inherit' }); } catch (e) { console.warn(`⚠️ Failed to generate Flow types for: ${file}`); } });\"",
-    "bundle:windows": "powershell -Command \"$outFile = 'lib/bundle.js.flow'; New-Item -ItemType Directory -Force -Path lib | Out-Null; Remove-Item -ErrorAction SilentlyContinue $outFile; $allContent = ''; Get-ChildItem -Recurse -Path flow-types -Filter *.js.flow | ForEach-Object { $allContent += Get-Content $_.FullName -Raw }; $clean = $allContent -replace '/\\*[^*]*\\*+(?:[^/*][^*]*\\*+)*/', '' -replace '(?m)^\\s*//.*$', ''; $lf = [char]10; $header = ('/**', ' * Copyright (c) Meta Platforms, Inc. and affiliates.', ' *', ' * This source code is licensed under the MIT license found in the', ' * LICENSE file in the root directory of this source tree.', ' *', ' * @flow strict-local', ' */', '') -join $lf; $output = $header + $lf + $clean; $utf8NoBom = New-Object System.Text.UTF8Encoding $false; [System.IO.File]::WriteAllText($outFile, $output, $utf8NoBom)\""
+    "bundle:js:windows": "npx rollup -c",
+    "bundle:flow:windows": "powershell -Command \"$outFile = 'lib/observite.js.flow'; New-Item -ItemType Directory -Force -Path lib | Out-Null; Remove-Item -ErrorAction SilentlyContinue $outFile; $allContent = ''; Get-ChildItem -Recurse -Path flow-types -Filter *.js.flow | ForEach-Object { $allContent += Get-Content $_.FullName -Raw }; $clean = $allContent -replace '/\\*[^*]*\\*+(?:[^/*][^*]*\\*+)*/', '' -replace '(?m)^\\s*//.*$', ''; $lf = [char]10; $header = ('/**', ' * Copyright (c) Meta Platforms, Inc. and affiliates.', ' *', ' * This source code is licensed under the MIT license found in the', ' * LICENSE file in the root directory of this source tree.', ' *', ' * @flow strict-local', ' */', '') -join $lf; $output = $header + $lf + $clean; $utf8NoBom = New-Object System.Text.UTF8Encoding $false; [System.IO.File]::WriteAllText($outFile, $output, $utf8NoBom)\""
   },
   "repository": {
     "type": "git",
@@ -22,10 +23,13 @@
   "homepage": "https://github.com/facebookincubator/observite#readme",
   "description": "",
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^28.0.3",
+    "@rollup/plugin-node-resolve": "^16.0.1",
     "@types/jest": "^29.5.14",
     "flowgen": "^1.21.0",
     "jest": "^29.7.0",
     "prettier": "^3.5.3",
+    "rollup": "^4.37.0",
     "ts-jest": "^29.2.6",
     "tsc-alias": "^1.8.11",
     "tsconfig-paths": "^4.2.0",
