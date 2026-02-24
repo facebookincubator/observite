@@ -38,8 +38,10 @@ Observite offers:
 ## Installation
 
 ```bash
-npm install observite
+npm install observite-js
 ```
+
+> **Note:** This package was previously published as `observite`, but that name was taken. The official package is now `observite-js`.
 
 ---
 

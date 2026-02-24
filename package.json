@@ -1,5 +1,5 @@
 {
-  "name": "observite",
+  "name": "observite-js",
   "version": "1.0.0",
   "description": "A lightweight global state management library with automatic memory cleanup and dynamic state containers.",
   "main": "lib/observite.cjs",
