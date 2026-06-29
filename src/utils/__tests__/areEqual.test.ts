@@ -171,12 +171,12 @@ describe('areEqual function', () => {
   describe('Type mismatch comparisons', () => {
     test('Map vs non-Map returns false', () => {
       const map = new Map([['key', 'value']]);
-      expect(areEqual(map, { key: 'value' }, ComparisonMethod.ShallowEqual)).toBe(
-        false
-      );
-      expect(areEqual({ key: 'value' }, map, ComparisonMethod.ShallowEqual)).toBe(
-        false
-      );
+      expect(
+        areEqual(map, { key: 'value' }, ComparisonMethod.ShallowEqual)
+      ).toBe(false);
+      expect(
+        areEqual({ key: 'value' }, map, ComparisonMethod.ShallowEqual)
+      ).toBe(false);
       expect(areEqual(map, { key: 'value' }, ComparisonMethod.DeepEquals)).toBe(
         false
       );
@@ -187,8 +187,12 @@ describe('areEqual function', () => {
 
     test('Set vs non-Set returns false', () => {
       const set = new Set([1, 2, 3]);
-      expect(areEqual(set, [1, 2, 3], ComparisonMethod.ShallowEqual)).toBe(false);
-      expect(areEqual([1, 2, 3], set, ComparisonMethod.ShallowEqual)).toBe(false);
+      expect(areEqual(set, [1, 2, 3], ComparisonMethod.ShallowEqual)).toBe(
+        false
+      );
+      expect(areEqual([1, 2, 3], set, ComparisonMethod.ShallowEqual)).toBe(
+        false
+      );
       expect(areEqual(set, [1, 2, 3], ComparisonMethod.DeepEquals)).toBe(false);
       expect(areEqual([1, 2, 3], set, ComparisonMethod.DeepEquals)).toBe(false);
     });
@@ -231,21 +235,27 @@ describe('areEqual function', () => {
 
     test('Map vs primitive returns false', () => {
       const map = new Map();
-      expect(areEqual(map, 'string', ComparisonMethod.ShallowEqual)).toBe(false);
+      expect(areEqual(map, 'string', ComparisonMethod.ShallowEqual)).toBe(
+        false
+      );
       expect(areEqual(map, 42, ComparisonMethod.ShallowEqual)).toBe(false);
       expect(areEqual(map, true, ComparisonMethod.DeepEquals)).toBe(false);
     });
 
     test('Set vs primitive returns false', () => {
       const set = new Set();
-      expect(areEqual(set, 'string', ComparisonMethod.ShallowEqual)).toBe(false);
+      expect(areEqual(set, 'string', ComparisonMethod.ShallowEqual)).toBe(
+        false
+      );
       expect(areEqual(set, 42, ComparisonMethod.ShallowEqual)).toBe(false);
       expect(areEqual(set, true, ComparisonMethod.DeepEquals)).toBe(false);
     });
 
     test('Array vs primitive returns false', () => {
       const arr: unknown[] = [];
-      expect(areEqual(arr, 'string', ComparisonMethod.ShallowEqual)).toBe(false);
+      expect(areEqual(arr, 'string', ComparisonMethod.ShallowEqual)).toBe(
+        false
+      );
       expect(areEqual(arr, 42, ComparisonMethod.ShallowEqual)).toBe(false);
       expect(areEqual(arr, true, ComparisonMethod.DeepEquals)).toBe(false);
     });
@@ -367,6 +377,43 @@ describe('areEqual function', () => {
       const obj4 = { a: 1, b: { x: 1 } };
       // Primitive 'a' matches, but 'b' is a different reference
       expect(areEqual(obj3, obj4, ComparisonMethod.ShallowEqual)).toBe(false);
+    });
+  });
+
+  describe('Date and RegExp comparison', () => {
+    test('equal Dates with different references are equal', () => {
+      expect(
+        areEqual(new Date(0), new Date(0), ComparisonMethod.ShallowEqual)
+      ).toBe(true);
+      expect(
+        areEqual(new Date(0), new Date(0), ComparisonMethod.DeepEquals)
+      ).toBe(true);
+    });
+
+    test('Dates with different times are not equal', () => {
+      expect(
+        areEqual(new Date(0), new Date(1000), ComparisonMethod.ShallowEqual)
+      ).toBe(false);
+      expect(
+        areEqual(new Date(0), new Date(1000), ComparisonMethod.DeepEquals)
+      ).toBe(false);
+    });
+
+    test('a Date is not equal to a plain object', () => {
+      expect(areEqual(new Date(0), {}, ComparisonMethod.DeepEquals)).toBe(
+        false
+      );
+    });
+
+    test('equal RegExps with different references are equal', () => {
+      expect(areEqual(/abc/gi, /abc/gi, ComparisonMethod.ShallowEqual)).toBe(
+        true
+      );
+    });
+
+    test('RegExps with different patterns or flags are not equal', () => {
+      expect(areEqual(/abc/g, /abd/g, ComparisonMethod.DeepEquals)).toBe(false);
+      expect(areEqual(/abc/g, /abc/i, ComparisonMethod.DeepEquals)).toBe(false);
     });
   });
 });
