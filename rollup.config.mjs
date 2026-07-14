@@ -11,7 +11,7 @@ const banner = `/**
 `;
 
 // Plugin to copy handwritten type declarations for react package
-// This ensures types import from 'observite' instead of bundling/inlining them
+// This ensures types import from 'observite-js' instead of bundling/inlining them
 const copyReactTypesPlugin = {
   name: 'copy-react-types',
   writeBundle() {
@@ -32,6 +32,9 @@ const rewriteObservitePlugin = {
         (normalizedSource.endsWith('/observite') || normalizedSource.endsWith('/observite.js') || normalizedSource === './observite' || normalizedSource === './observite.js') &&
         !normalizedSource.includes('react')
       ) {
+        // Keep the internal id 'observite' so the generated CJS variable is
+        // named `observite`; output.paths rewrites the require/import target
+        // to the published package name 'observite-js'.
         return { id: 'observite', external: true };
       }
     }
@@ -87,6 +90,7 @@ export default [
       sourcemap: false,
       banner,
       exports: 'named',
+      paths: { observite: 'observite-js' },
     },
     external: ['react'],
     plugins: [rewriteObservitePlugin, resolve()],
@@ -101,6 +105,7 @@ export default [
       banner,
       exports: 'named',
       outro: `module.exports = exports;`,
+      paths: { observite: 'observite-js' },
     },
     external: ['react'],
     plugins: [rewriteObservitePlugin, resolve()],
@@ -115,6 +120,7 @@ export default [
       banner,
       exports: 'named',
       outro: `module.exports = exports;`,
+      paths: { observite: 'observite-js' },
     },
     external: ['react'],
     plugins: [rewriteObservitePlugin, resolve(), copyReactTypesPlugin],

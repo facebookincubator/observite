@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  *
  * React bindings for Observite.
- * Import from 'observite/react' to use React hooks with observables.
+ * Import from 'observite-js/react' to use React hooks with observables.
  */
 
 export { useObserver } from './react-bindings/hooks/useObserver';

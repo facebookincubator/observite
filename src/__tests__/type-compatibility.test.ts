@@ -6,7 +6,7 @@
  *
  * Type compatibility compile test.
  *
- * This file verifies that the types from 'observite' and 'observite/react'
+ * This file verifies that the types from 'observite-js' and 'observite-js/react'
  * are compatible when used together. The test passes if this file compiles
  * without TypeScript errors.
  *
@@ -22,8 +22,8 @@ import {
     Observable,
     ObservableMap,
     ComponentObserver,
-} from 'observite';
-import { useObserver } from 'observite/react';
+} from 'observite-js';
+import { useObserver } from 'observite-js/react';
 
 // Type-level test: useObserver return type should be ComponentObserver
 type UseObserverReturnType = ReturnType<typeof useObserver>;
